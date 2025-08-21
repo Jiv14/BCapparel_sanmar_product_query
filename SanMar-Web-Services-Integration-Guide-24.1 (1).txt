@@ -1,0 +1,7418 @@
+SanMar Web Services Integration Guide v24.1
+Web Services Integration Guide v24
+Updated: July 2025
+
+SanMar
+Web Services Integration
+Product Information – Inventory – Pricing – Invoicing
+
+Copyright © 2025 SanMar Corporation. All Rights Reserved No part of this publication may be reproduced or transcribed
+in any form without permission of the publisher.
+
+1
+
+SanMar Web Services Integration Guide v24.1
+Web Services Integration Guide v24
+
+Table of Contents
+Onboarding Process ....................................................................................................................................... 5
+Authentication ............................................................................................................................................... 7
+Make a SOAP Call ........................................................................................................................................... 8
+Make a SOAP Call Using SoapUI ...................................................................................................................... 9
+Errors ........................................................................................................................................................... 11
+Web Service Data Usage .............................................................................................................................. 13
+SanMar Integration Best Practices ................................................................................................................ 14
+Brand Restrictions ........................................................................................................................................ 18
+SanMar Web Service PHP Quick Start Guide ................................................................................................. 19
+SanMar Standard Product Information Services ........................................................................................... 25
+PromoStandards - Product Data Services V2.0.0 ........................................................................................... 40
+PromoStandards - Media Content Services V1.1.0 ........................................................................................ 54
+SanMar Product Inventory Service ............................................................................................................... 60
+PromoStandards – Inventory Services V2.0.0 ............................................................................................... 67
+SanMar Pricing Service ................................................................................................................................. 77
+
+2
+
+SanMar Web Services Integration Guide v24.1
+Web Services Integration
+Guide v24
+PromoStandards
+- Pricing
+and Configuration Services ................................................................................... 81
+
+PromoStandards - Order Shipment Notification Service V1.0.0..................................................................... 88
+PromoStandards Product Order Status Service V2.0.0 .................................................................................. 93
+SanMar Standard Invoicing Services ........................................................................................................... 103
+PromoStandards Invoice Services V1.0.0 ..................................................................................................... 127
+SanMar License Plate Number Service ........................................................................................................ 133
+Change Log ................................................................................................................................................. 137
+
+3
+
+SanMar Web Services Integration Guide v24.1
+Web Services Integration Guide v24
+
+SanMar Web Services API Overview
+The SanMar API is a suite of tools that will allow you to retrieve SanMar-related information
+electronically, including product pricing, inventory, order shipment notifications, invoices, and
+package slip details. SanMar currently offers proprietary API methods and PromoStandards API
+methods for customers who need extra flexibility. As our services run in real-time, details can be
+retrieved so that your system is up to date with the latest SanMar offerings. Because our servers
+are being leveraged for the API methods, your application will require less data storage. All API
+services offered are free to use for SanMar customers.
+You can utilize the SanMar API in multiple ways, including invoice retrieval for your accounting
+needs, extracting real-time product inventory to keep track of SanMar product stock, or getting
+our latest product details for use in an e-commerce web application.
+The API is an XML-based SOAP API, so knowledge of the SOAP protocol and how to program with
+it is necessary from a development standpoint. API calls are made in XML format, sent to our
+servers, and in return our servers will send an XML response back to your system with the
+requested details. As the SOAP protocol is agnostic, you or a developer can work with any
+programming language of your choice. For each API service, we offer production endpoints for
+real-time access and TEST endpoints for testing purposes. To request access to our API, please
+e-mail sanmarintegrations@sanmar.com and a representative will contact you.
+
+4
+
+SanMar Web Services Integration Guide v24.1
+Web Services Integration Guide v24
+
+Onboarding Process
+FTP / Web Services Integration Onboarding steps
+1. Initiate the onboarding process by emailing your request and SanMar Customer Number to
+sanmarintegrations@sanmar.com.
+2. SanMar will send you an integration agreement for e-signature along with the integration
+documentation. Currently SanMar does not charge for integration access; however, we do require the
+company Owner or other Authorized Signatory to sign our Integration Agreement.
+3. Once SanMar receives the signed agreement, onboarding for FTP and/or Web Services access should
+be completed within 1-2 business days. Upon completion, SanMar will send an email with access
+instructions, best practices, and a secure link to your FTP credentials.
+
+-
+
+Please note:
+Your FTP credentials are different from the Web Services credentials. After onboarding is complete,
+your SanMar.com username and password will work to authenticate production PromoStandards and
+SanMar Web Service APIs.
+Purchase Order Integration Onboarding steps
+
+1. Once your account has been onboarded for FTP and/or Web Services access and you have verified your
+access to SanMar product data, you may request Purchase Order integration.
+2. Upon receiving a PO integration request, SanMar will set up an account for you in our Test
+environment within 2-3 business days. SanMar will provide a secure one-time access link to retrieve
+your Web Services user credentials for the Test environment.
+3. SanMar requires testing on the Test environment to be completed using an address you intend to use
+in production and for you to submit an order with multiple lines. Additional testing may be required if
+you plan to ship using the PSST ship-via or based on your account. Refer to our PO Integration guide for
+details.
+4. Once you have submitted a test PO, please send an email with your PO number to the SanMar
+Integration Support team (sanmarintegrations@sanmar.com). SanMar will review the order files and
+provide further guidance as needed.
+5. Once testing has completed on Test environment, SanMar will request the username, shipping
+information, and payment method for the integrated PO configuration in production. Once those have
+been supplied, SanMar will configure your production account for integrated PO processing within 1-2
+business days.
+The above timelines may extend depending on the complexity of your situation and testing needs.
+
+5
+
+SanMar Web Services Integration Guide v24.1
+Web Services Integration Guide v24
+
+Integration Onboarding Flowchart
+
+6
+
+SanMar Web Services Integration Guide v24.1
+Web Services Integration Guide v24
+
+Authentication
+SanMar’s standard production web service calls require authentication with a SanMar customer number,
+SanMar.com username, and SanMar.com password. SanMar’s PromoStandards web service calls require
+authentication with a SanMar.com username and SanMar.com password. You can create production
+SanMar.com credentials at the following location: https://www.sanmar.com/signup/webuser.
+To test the calls in a Test environment, please contact sanmarintegrations@sanmar.com with your
+account number and a reason for your request. A member of our support staff will respond with further
+instructions.
+Please Note: This environment is used for testing and process improvement and may be unavailable
+during internal updates from time to time.
+
+Authentication for the SanMar Standard Web Service calls
+Field
+SanMarCustomerNumber
+SanMarUserName
+SanMarUserPassword
+senderId
+senderPassword
+
+Required
+Yes
+Yes
+Yes
+No
+No
+
+Type
+INT
+STRING
+STRING
+
+Description
+SanMar Customer Number
+SanMar.com Username
+SanMar.com Password
+Not currently used by SanMar
+Not currently used by SanMar
+
+Please Note: Inventory and invoice services present exceptions to the basic authentication parameters which are explained within the
+description of the services.
+
+Authentication for PromoStandards Web Service calls
+Field
+id
+password
+
+Required
+Yes
+Yes
+
+Type
+STRING
+STRING
+
+Description
+SanMar.com Username
+SanMar.com Password
+
+Authentication Responses
+Field
+errorOccurred
+
+Type
+BOOLEAN
+
+message
+
+STRING
+
+Notes
+true or false - Indicates if an error has occurred
+If the errorOccurred = false, no message is returned
+If the errorOccurred = true, the message returned is “ERROR: User authenticating
+failed “
+
+7
+
+SanMar Web Services Integration Guide v24.1
+Web Services Integration Guide v24
+
+Make a SOAP Call
+The following section demonstrates how to make a SOAP API call using the GetProductSellable method
+of the PromoStandards Product Data Service WSDL. This method returns a list of Product Ids and Part Ids
+based on their availability to sell. You can use tools such as Postman or SoapUI to make a SOAP API call.
+PromoStandards Product Data Service V2.0.0 WSDL:
+https://ws.sanmar.com:8080/promostandards/ProductDataServiceBindingV2?WSDL
+Authentication is provided in the id (SanMar.com username) and password (SanMar.com password)
+XML sections. The required fields for this call include wsVersion (PromoStandards Version), productId
+(SanMar style number), and isSellable (true).
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:ns="http://www.promostandards.org/WSDL/ProductDataService/2.0.0/"
+xmlns:shar="http://www.promostandards.org/WSDL/ProductDataService/2.0.0/SharedObjects/">
+
+<soapenv:Header/>
+<soapenv:Body>
+<ns:GetProductSellableRequest>
+<shar:wsVersion>2.0.0</shar:wsVersion>
+<shar:id> SanMarUsername </shar:id>
+<shar:password> SanMarPassword</shar:password>
+<shar:productId>LOG105</shar:productId>
+<shar:isSellable>true</shar:isSellable>
+</ns:GetProductSellableRequest>
+</soapenv:Body>
+</soapenv:Envelope>
+
+The response shows the productId (SanMar style number) and partId (unique key) for the requested
+details:
+<ProductSellable>
+<ns2:productId>LOG105</ns2:productId>
+<ns2:partId>583922</ns2:partId>
+</ProductSellable>
+
+8
+
+SanMar Web Services Integration Guide v24.1
+Web Services Integration Guide v24
+
+Make a SOAP Call Using SoapUI
+The following demonstrates how to use the SoapUI tool to test the Test getPricing method.
+Step 1: Download and install SoapUI: https://www.soapui.org/downloads/soapui/source-forge.html
+Step 2: Click on File ➔ New Soap Project
+Step 3: Copy the following Test WSDL link and paste it to the Initial WSDL field. (https://testws.sanmar.com:8080/SanMarWebService/SanMarPricingServicePort?wsdl). This will auto-populate
+the project name. Click OK.
+
+Step 4: In the schema list, click on the + sign next to getPricing, and then double-click on Request1. The
+XML schema parameters will populate on the right panel.
+
+9
+
+SanMar Web Services Integration Guide v24.1
+Web Services Integration Guide v24
+
+Step 5: Fill out the XML parameters for style (pc61), color (White), size (XL), SanMarCustomerNumber,
+SanMarUserName, and SanMarUserPassword. Click the Green Arrow button on the top bar to execute
+the call. The XML response will populate on the right side of the request.
+
+Please be advised that since our Test environment is for testing purposes only, products, pricing,
+and inventory may not match production. These items can be retrieved safely in production as they
+are not making any modifications.
+
+10
+
+SanMar Web Services Integration Guide v24.1
+Web Services Integration Guide v24
+
+Errors
+The following list the most common errors for both SanMar’s standard and PromoStandards API calls.
+
+SanMar Standard Web Service Errors
+
+Error Message
+
+Description
+
+Invalid Style +
+Color + Size
+specified.
+
+Either an invalid style, SanMar mainframe color, or size was used in the request. Valid
+SanMar style numbers, mainframe colors, and sizes can be obtained from the
+SanMar_SDL_N.csv file at the following location:
+https://www.sanmar.com/resources/electronicintegration/sanmardatalibrary
+
+User
+authentication
+failed.
+
+Invalid customer number, username, or password. You can reset a SanMar.com username or
+password by navigating to SanMar.com and clicking on ‘Forgot Username or Password’.
+
+Invalid
+warehouse
+specified
+
+An incorrect warehouse number was used in the request. The following list shows SanMar’s
+warehouse numbers and locations:
+1 Seattle, WA
+2 Cincinnati, OH
+3 Dallas, TX
+4 Reno, NV
+5 Robbinsville, NJ
+6 Jacksonville, FL
+7 Minneapolis, MN
+12 Phoenix, AZ
+31 Richmond, VA
+
+11
+
+SanMar Web Services Integration Guide v24.1
+Web Services Integration Guide v24
+
+PromoStandards Web Service Errors
+
+Code
+
+Description
+
+100
+
+ID (customerID) not found
+
+104
+
+This account is unauthorized to use this service. Please contact the service provider
+
+105
+
+Authentication Credentials failed
+
+110
+
+Authentication Credentials required
+
+115
+
+wsVersion not found
+
+120
+
+The following field(s) are required [Comma Delimited field names]
+
+125
+130
+
+Not Supported: [details]
+Product Id not found
+
+135
+
+Product color not found
+
+140
+
+Part Id not found
+
+145
+
+Part color not found
+
+150
+
+Part size not found
+
+155
+
+Invalid Date Format
+
+160
+
+No Results Found
+
+200
+
+Product Data not found
+
+300
+
+queryType not found
+
+301
+
+Reference Number not found – Purchase Order or Invoice Number not found (The purchase
+order must be shipped and invoiced in our system)
+
+302
+
+shipmentDateTimeStamp is incorrect or is an invalid date range
+
+303
+
+Input date should not be older than 7 Days
+
+999
+
+General Error – Contact the System Service Provider
+
+12
+
+SanMar Web Services Integration Guide v24.1
+Web Services Integration Guide v24
+
+Web Service Data Usage
+SanMar currently does not have hard limits when calling our API. However, we do advise that you use
+discretion.
+When using the SanMar standard inventory and pricing services, it is vital that your system pulls data for
+a select number of items and avoids making thousands of requests daily. We recommend using the
+PromoStandards inventory and pricing methods for frequent data pulls.
+To test product information, inventory, and pricing, we recommend using the production WSDLs to
+avoid inconsistencies and the lack of up-to-date data in our lower environment.
+
+Web Service Connectivity Challenges
+If you experience a timeout when attempting to view the WSDL XML in a browser, then there may be a
+firewall or service issue. If you cannot ping our IP address (63.251.12.134), then there could be a block in
+your software/hardware firewall, or port 8080 could be closed on your web server. You may need to
+reconfigure your firewall, or open port 8080 to inbound and outbound traffic with your web server’s host.
+If you have tried these options and you are still experiencing a timeout, please contact the integrations
+team at sanmarintegrations@sanmar.com for further troubleshooting.
+
+13
+
+SanMar Web Services Integration Guide v24.1
+Web Services Integration Guide v24
+
+SanMar Integration Best Practices
+The following list contains best practices for our top API calls. Following these best practices can lead to
+better reliability of our API and help reduce excessive calls.
+
+Invoicing
+We invoice once per day after 9 p.m. Pacific Time for orders shipped that day. We recommend that you
+delay pulling invoice data by one extra day. For example, if an order is placed on 1/27, you would wait
+until 1/28 to pull the invoice data from our API. Doing this ensures that invoicing processes have been
+completed and data is available. If you are using the PromoStandards GetInvoices API method, please do
+so after 3 p.m. Pacific Time.
+The Daily Invoice File, which is generated once a day at 6 a.m. Pacific Time on our ftp server, will have
+details for all orders invoiced the day prior. This file will share the same data as our invoicing calls.
+Please email sanmarintegrations@sanmar.com for Daily Invoice File and our FTP server requests.
+Please Note: If you are pulling invoices by reference number, then one to two API calls per day should
+suffice. There is no need to make multiple calls to retrieve invoices for a specific order.
+
+Invoicing Pull
+Frequency
+Once a day after 3
+p.m.
+
+Best Option
+
+Alternative Option
+
+Daily Invoice
+File
+
+PromoStandards Invoice Service V1.0.0 or SanMar Standard Invoice
+Service
+
+Inventory
+If you use the sanmar_dip.txt file for tracking base inventory information, then please be advised that
+this file includes discontinued products. Discontinued items in this file will show a quantity of zero. All
+styles and sizes for a specific color will continue to be listed on the file if there are at least 12 items left
+in any size for the product that is discontinued.
+Use the below columns/values in the sanmar_dip.txt file to determine if you need to exclude data or
+stop API calls:
+• discontinued_code = S
+• quantity = 0
+Please Note: There is the potential that some inventory can come in as a return of a discontinued item.
+If the discontinued item is available when the next sanmar_dip.txt file is generated, then the zero values
+could increase. In this scenario, it is okay to start re-checking the inventory for this item.
+
+14
+
+SanMar Web Services Integration Guide v24.1
+Web Services Integration Guide v24
+
+Inventory Pull Recommendations
+The sanmar_dip.txt file is updated hourly and the best resource for up-to-date inventory. We advise
+using one of the recommendations below based on your use case.
+
+Inventory Pull Frequency
+One time per day of our full
+or partial catalog
+
+Best Option
+sanmar_dip.txt / epdd.csv
+
+Two - Three times per day of
+our full or partial catalog
+
+sanmar_dip.txt
+
+Four or more times per day
+of our full catalog
+Live inventory check at the
+time of ordering
+
+sanmar_dip.txt
+PromoStandards Inventory
+Services v2.0.0
+
+Alternative Option
+PromoStandards Inventory Services v2.0.0 or
+SanMar Product Inventory Service (at
+Product or Style level = 3000 API calls)
+PromoStandards Inventory Services v2.0.0 or
+SanMar Product Inventory Service (at Product or
+Style level = 3000 API calls per occurrence)
+
+SanMar Standard Product Inventory Service.
+
+Pricing
+Pricing for SanMar products is updated one – two times per year. This includes MSRP, case price, and
+customer negotiated pricing. Sale pricing is updated every Monday and Wednesday.
+For pricing retrieval, we recommend using the sanmar_dip.txt file. This file is updated hourly and will
+have piece, case, and sales pricing. For sales pricing, we advise pulling this file on Mondays and
+Wednesdays. For any other pricing, we recommend pulling once per month.
+
+Pricing Tier
+
+Best Option
+
+Alternative Option
+
+Sales Pricing
+
+Pricing Pull
+Frequency
+One pull on
+Mondays and
+Wednesdays
+
+sanmar_dip.txt
+
+SanMar Standard Pricing Service at the style
+number level, SanMar Standard Product Service
+at the style number level
+
+Case Pricing
+
+Once per month
+
+sanmar_dip.txt /
+Sanmar_epdd.csv
+
+PromoStandards Pricing and Configuration Service
+at the ProductID level, SanMar Standard Pricing
+Service at the style number level, SanMar
+Standard Product Service at the style number
+level
+
+Customer
+Negotiated
+Pricing
+
+Once per month
+
+Incentive Pricing File
+/ Daily Pricing File
+
+PromoStandards Pricing and Configuration Service
+at the ProductID level, or the SanMar Standard
+Pricing Service at the style number level
+
+MSRP
+
+Once per month
+
+Sanmar_epdd.csv
+
+PromoStandards Pricing and Configuration Service
+at the ProductID level
+
+15
+
+SanMar Web Services Integration Guide v24.1
+Web Services Integration Guide v24
+
+Order Status
+We recommend using the PromoStandards Order Status V2.0.0 service to retrieve order status no more
+than three times daily. Please wait two hours after your purchase order has been placed to check the
+status.
+If the returned status shows a ‘Complete’ or ‘Canceled’ return at the order header level you may cease
+calling that PO. No further updates will be provided.
+
+Order Status
+Pull
+Frequency
+
+Best Option
+
+Error Handling
+
+One – Three
+times per
+day
+
+PromoStandards
+Order Status V2.0.0
+service
+
+If you receive a 301 error, please hold off on checking order status for
+at least 24 hours. If you receive a 301 error after 48 hours, then this
+would mean your order may not have made it into the system. You
+should flag these for internal review and contact your Account
+Executive if you have questions. Please Note: You should stop using the
+Order Status service until you have resolved the issue.
+
+Order Shipment Notification
+We recommend that you use the Daily Status File through our FTP server to obtain shipment
+notifications for your orders. The status file is created nightly for all orders shipped that day.
+Alternatively, you can use the PromoStandards Order Shipment Notification Service - V1.0.0 to retrieve
+your shipment notifications. We recommend using this call no more than three times per day.
+
+Order
+Shipment
+Notification
+Pull Frequency
+
+Best
+Option
+
+Alternate Option
+
+Error Handling
+
+One – Three
+times per day
+
+Daily
+Status
+File
+
+PromoStandards
+Order Shipment
+Notification Service V1.0.0
+
+If you receive a 301 error, please hold off on checking
+order status for at least 24 hours. If you receive a 301
+error after 48 hours, then this would mean your order
+may not have made it into the system. You should flag
+these for internal review and contact your Account
+Executive if you have questions. Please Note: You should
+stop using the Order Status service until you have
+resolved the issue.
+
+16
+
+SanMar Web Services Integration Guide v24.1
+Web Services Integration Guide v24
+
+Product Data
+If your goal is to update the entire catalog, we recommend using the sanmar_dip.txt file or the
+EPDD/SDL file on our FTP server once a month. The next best option would be to use our Standard
+Product Data service at the style level or the PromoStandards Product Data service at the productid
+(style) level. Using these services at the style/productid level instead of the SKU level (style/color/size)
+can prevent excessive API calls to our servers.
+For a one-time load of the entire SanMar catalog, you can use the getProductBulkInfo method to
+generate a bulk file in the SanMarPI folder on our FTP server. For future product iterations, you can use
+the DeltaInfo method to generate a delta file in the SanMarPI folder on our FTP server. You can also use
+the PromoStandards product data service at the style level to retrieve iterative product updates.
+For media consumption through the PromoStandards getMediaContent function, we recommend
+pulling data at the productid (style) level as opposed to the partId (unique key) level. Pulling media at
+the productid level will retrieve images for each variant under the requested style and reduce the
+number of API calls to our servers.
+
+17
+
+SanMar Web Services Integration Guide v24.1
+Web Services Integration Guide v24
+
+Brand Restrictions
+The following brands are prohibited from being sold without embellishment on any third party or direct to consumer
+website, including Amazon, eBay, and Craigslist:
+Brooks Brothers
+Carhartt
+Cotopaxi
+Eddie Bauer
+
+New Era
+Nike
+OGIO
+
+Outdoor Research
+Stanley/Stella
+tentree
+
+The North Face
+Tommy Bahama
+Travis Mathew
+
+Map Pricing
+All customers must adhere to our Minimum Advertised Pricing (MAP) policy. Per our sales policy, customers
+may not advertise or promote products at discounts greater than 10% off MSRP or SanMar promotional
+pricing for retail items or 20% for our private label brands. Customers may not advertise any discount on
+bags by OGIO.
+MAP = 10% OFF MSRP
+
+Alternative Apparel
+Brooks Brothers
+Bulwark
+Champion
+Cotopaxi
+Eddie Bauer
+New Era
+Nike
+OGIO
+
+Outdoor Research
+Red House
+Red Kap
+Russell Outdoors
+Spacecraft
+Stanley/Stella
+tentree
+The North Face
+Travis Mathew
+Wink
+
+MAP = 20% OFF MSRP
+
+MAP = MSRP
+
+No MAP
+
+AllMade
+CornerStone
+District
+Mercer+Mettle
+Port & Co
+Port Authority
+Sport-Tek
+Volunteer Knitwear
+
+Carhartt
+Nike Bags
+Tommy Bahama
+
+A4
+Anvil
+Bella+Canvas
+Comfort Colors
+Fruit of the Loom
+Gildan
+Hanes
+Jerzees
+Next Level
+Rabbit Skins
+
+Global Trade Item Numbers (GTIN)
+GTIN’s for the following brands are available in the SanMar_SDL_N.csv and SanMar_EPDD.csv files on our FTP server:
+A4
+Allmade
+Alternative
+American Apparel
+Anvil
+Bella+Canvas
+Brooks Brothers
+Bulwark
+
+Carhartt
+Champion
+Comfort Colors
+Cornerstone
+Cotopaxi
+District
+Eddie Bauer
+Fruit of the Loom
+
+Gildan
+Hanes
+Jerzees
+Mercer+Mettle
+Next Level
+Nike
+Ogio
+Outdoor Research
+
+Port & Co
+Port Authority
+Precious Cargo
+Rabbit Skins
+Red House
+Red Kap
+Russel Outdoors
+Spacecraft
+
+Sport-tek
+Stanley/Stella
+tentree
+The North Face
+Tommy Bahama
+TravisMathew
+Volunteer Knitwear
+Wink
+
+Hemmed Pants:
+SanMar does not provide integrated data or support integrated PO submittal for hemmed pants due to additional sourcing
+and processing fees. Hemmed pants can be ordered via our other ordering channels (SanMar.com / Phone / Email).
+Unhemmed pants are part of integrated data-feeds and are supported for integrated PO submittal.
+18
+
+SanMar Web Services Integration Guide v24.1
+Web Services Integration Guide v24
+
+SanMar Web Service PHP Quick Start Guide
+Overview: The SanMar Web Service API is a SOAP-based API that allows systems to receive SanMar- related
+information electronically. The SanMar Product Information Web Service provides real-time access to
+SanMar’s product data, including pricing, descriptions, and images. This quick start guide will walk you
+through the steps to create a simple PHP application to display the product information XML response for a
+SanMar style/color/size combination in a browser.
+
+Prerequisites:
+Obtain SanMar Web Services Access
+You will need to obtain access to SanMar’s Web Service before you can use it.
+Contact sanmarintegrations@Sanmar.com to request access. The SanMar integration team will send you an esign agreement to fill out. Upon completion, it will take the integration team 24-48 hours to set up your
+integration account.
+SanMar Product Information WSDL
+You will be using the getProductInfoByStyleColorSize method from the following WSDL:
+https://ws.sanmar.com:8080/SanMarWebService/SanMarProductInfoServicePort?wsdl
+The getProductInfoByStyleColorSize method will allow you to retrieve product details back based on a
+style/color/size request.
+XAMPP
+You will need to install the latest version of XAMPP. The XAMPP download will come bundled with the newest
+versions of PHP and Apache Server.
+Your Favorite IDE
+Visual Studio Code has been used for the code example. However, you can use any IDE.
+
+19
+
+SanMar Web Services Integration Guide v24.1
+
+Step 1: Before jumping into the code, review the XML request and response for the
+getProductInfoByStyleColorSize method using style: pc61, color: natural, and size: small (s).
+The XML request below takes six parameters. Enter the product parameters between the
+<arg0> tags: color, size, and style. Between the <arg1> tags, enter your credentials:
+sanMarCustomerNumber (your SanMar customer number), sanMarUserName (your SanMar.com
+username), and the sanMarUserPassword (your SanMar.com password).
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:impl="http://impl.webservice.integration.sanmar.com/">
+<soapenv:Header />
+<soapenv:Body>
+<impl:getProductInfoByStyleColorSize>
+<!--Zero or more repetitions:-->
+<arg0>
+<color>Natural</color>
+<size>S</size>
+<style>pc61</style>
+</arg0>
+<arg1>
+<sanMarCustomerNumber>YourSanMarCustomerNumber</sanMarCustomerNumber>
+<sanMarUserName>YourSanmar.comUsername</sanMarUserName>
+<sanMarUserPassword>YourSanmar.comPassword</sanMarUserPassword>
+</arg1>
+</impl:getProductInfoByStyleColorSize>
+</soapenv:Body>
+</soapenv:Envelope>
+
+The XML response received back is below:
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<ns2:getProductInfoByStyleColorSizeResponse xmlns:
+ns2="http://impl.webservice.integration.sanmar.com/">
+<return>
+<errorOccured>false</errorOccured>
+<listResponse>
+<productBasicInfo>
+<availableSizes>Adult Sizes: S-6XL</availableSizes>
+<brandName>Port &amp; Company</brandName>
+<caseSize>72</caseSize>
+<catalogColor>Natural</catalogColor>
+<color>Natural</color>
+<inventoryKey>11807</inventoryKey>
+<keywords>embroidery, embroider, embroidering, screen printing, screenprinting,
+screen-printing, screen print, screenprint, screen-print, heat transfer,
+heat transfering, heat-transfering, heat seal, heat sealing, heat-sealing,
+pad-printing, pad-print, padprint, padprinting, male, males,Short sleeve,
+short sleeves, short sleeved, shortsleeve, shortsleeves, shortsleeved,
+short-sleeve, short-sleeves, short-sleeved, t shirt,t-shirt, tshirt,
+t shirts, t-shirts, tshirts, tee shirt, teeshirt, tee-shirt, heavyweight,
+pre shrunk, best seller, soft, comfortable, cotton, 100% cotton, xs, s, m, l,
+xl, 2xl, 3xl, 4xl, 5xl, 6xl, xxl, xxxl, xxxxl, xxxxxl, xxxxxxl,men, men's,
+mens,</keywords>
+<pieceWeight>0.38</pieceWeight>
+
+20
+
+SanMar Web Services Integration Guide v24.1
+<productDescription>A year-round essential, our best-selling t-shirt has been
+voted "most popular" by groups, teams, clubs and schools across America.
+6.1-ounce, 100% soft spun cotton
+98/2 cotton/poly(Ash)
+Removable tag for comfort and relabeling</productDescription>
+<productStatus>Active</productStatus>
+<productTitle>Port &amp; Company - Essential Tee. PC61</productTitle>
+<size>S</size>
+<sizeIndex>2</sizeIndex>
+<style>PC61</style>
+<uniqueKey>118072</uniqueKey>
+<category>T-Shirts</category>
+</productBasicInfo>
+<productImageInfo>
+<brandLogoImage>https://cdnm.sanmar.com/catalog/images/portandcompanyheader.jpg
+</brandLogoImage>
+<colorProductImage>https://cdnm.sanmar.com/catalog/images/imglib/catl/2016/
+f17/PC61_natural_model_front_102016.jpg</colorProductImage>
+<colorProductImageThumbnail>https://cdnm.sanmar.com/cache/altview/imglib/catl/
+2016/f17/PC61_natural_model_front_102016.jpg</colorProductImageThumbnail>
+<colorSquareImage>https://cdnm.sanmar.com/swatch/gifs/port_natural.gif
+</colorSquareImage>
+<colorSwatchImage>https://cdnm.sanmar.com/catalog/images/PC61sw.jpg
+</colorSwatchImage>
+<productImage>https://cdnm.sanmar.com/catalog/images/PC61.jpg</productImage>
+<specSheet>https://www.apparelvideos.com/images/specsheet/pdf/specsheet/
+PC61_specsheet.pdf</specSheet>
+<thumbnailImage>https://cdnm.sanmar.com/catalog/images/PC61TN.jpg</thumbnailImage>
+<titleImage />
+<frontModel>https://cdnm.sanmar.com/imglib/mresjpg/2016/f17/
+PC61_natural_model_front_102016.jpg</frontModel>
+<backModel>https://cdnm.sanmar.com/imglib/mresjpg/2016/f17/
+PC61_natural_model_back_102016.jpg</backModel>
+<sideModel>https://cdnm.sanmar.com/imglib/mresjpg/2016/f17/
+PC61_natural_model_side_102016.jpg</sideModel>
+<backFlat>https://cdnm.sanmar.com/imglib/mresjpg/2010/f1/
+PC61_Natural_back_FS06.jpg</backFlat>
+<frontFlat>https://cdnm.sanmar.com/imglib/mresjpg/2010/f1/
+PC61_Natural_Flat_Front_2009.jpg</frontFlat>
+<threeQModel>https://cdnm.sanmar.com/imglib/mresjpg/2016/f17/
+PC61_natural_model_3q_102016.jpg</threeQModel>
+</productImageInfo>
+<productPriceInfo>
+<casePrice>2.84</casePrice>
+<caseSalePrice>2.38</caseSalePrice>
+<dozenPrice>3.84</dozenPrice>
+<dozenSalePrice>2.38</dozenSalePrice>
+<piecePrice>3.84</piecePrice>
+<pieceSalePrice>2.38</pieceSalePrice>
+<priceCode>A/P</priceCode>
+<priceText>Price applies to sizes S-XL</priceText>
+<saleEndDate>2023-04-01</saleEndDate>
+<saleStartDate>2023-03-27</saleStartDate>
+</productPriceInfo>
+</listResponse>
+<message>Product Info sent successfully.</message>
+</return>
+</ns2:getProductInfoByStyleColorSizeResponse>
+</S:Body>
+</S:Envelope>
+
+21
+
+SanMar Web Services Integration Guide v24.1
+
+Step 2: Open XAMPP Control Panel and click Start for the Apache and MySQL Modules.
+
+Step 3: Navigate to the folder where XAMPP was installed and click on the htdocs folder. Right-click
+inside the folder and select New ➔ Text Document. Name the file ‘productExample.php.’ Open the
+‘productExample.php’ file in Visual Studio Code or your preferred IDE.
+
+22
+
+SanMar Web Services Integration Guide v24.1
+
+Step 4: Copy and paste the code sample below to the productExample.php file and save. Be sure to add
+your SanMar credentials in the $webServiceUser array:
+
+//creating SoapClient object- please review the web services integration guide for
+details.
+<?php
+try {
+$client = new SoapClient('https://ws.sanmar.com:8080/SanMarWebService/
+SanMarProductInfoServicePort?wsdl', array(
+'trace' => true,
+'exceptions' => true));
+// Product Query
+$productInfoByStyleColorSize = array(
+'style' => 'pc61',
+'color' => 'natural',
+'size' => 's');
+//web service credential
+$webServiceUser = array(
+'sanMarCustomerNumber' => 'sanmarCustomerNumber',
+'sanMarUserName' => 'Sanmar.comUsername',
+'sanMarUserPassword' => 'sanmar.comPassword');
+//Setting array arguments for service call
+$getProductInfoByStyleColorSize = array(
+'arg0' => $productInfoByStyleColorSize,
+'arg1' => $webServiceUser);
+//calling service and getting response
+$response = $client->getProductInfoByStyleColorSize
+($getProductInfoByStyleColorSize);
+$arr = json_decode(json_encode($response), true);
+//print entire array
+print_r($arr);
+echo '<br><br><br>';
+//print specific array element
+print_r($arr['return']['listResponse']['productBasicInfo']
+['productDescription']);
+} catch (Exception $e) {
+echo $e->getMessage();
+}
+?>
+
+23
+
+SanMar Web Services Integration Guide v24.1
+
+In the code, PHP’s built-in SoapClient method is used to access the SanMar Product Information WSDL. For
+the request, you use the soapCall method which submits your web service credentials, and the query for
+the PC61/Natural/Small to the getProductInfoByStyleColorSize method.
+The full XML response is printed out by using Print Entire Array method. There is also an example of printing a specific
+array element.
+
+Step 5: Response: You should see a similar response below. The response will retrieve all product data
+related to the query.
+
+24
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar Standard Product Information Services
+TEST: https://test-ws.sanmar.com:8080/SanMarWebService/SanMarProductInfoServicePort?wsdl
+PRODUCTION: https://ws.sanmar.com:8080/SanMarWebService/SanMarProductInfoServicePort?wsdl
+There are five functions available for this web service.
+getProductBulkInfo
+getProductDeltaInfo
+getProductInfoByBrand
+getProductInfoByCategory
+getProductInfoByStyleColorSize
+
+SanMar getProductBulkInfo and getProductDeltaInfo Service
+The BulkInfo service creates a CSV data file with all our product information in the
+SanMarPDD/SanMarPI directory of our FTP server 20 minutes after the request is submitted.
+This service can be used once a month. Naming of the file will display in the following format:
+SanMarPI-Bulk-YourSanMarCustomerNumber.csv.
+The DeltaInfo service creates an incremental CSV data file which will contain only information
+for products that have changed from the last Bulk or Delta request. The file will be generated
+in the SanMarPDD/SanMarPI directory of our FTP server 20 minutes after the request is
+submitted. The service can be used daily. Naming of the file will display SanMarPI-DeltaYourSanMarCustomerNumber.csv.
+We recommend replacing the existing lines of data in your database with new data by matching
+the unique_key. The unique_key is a unique identifier for each style number, color, and size
+combination.
+
+SanMar getProductBulkInfo Service and getProductDeltaInfo XML Request
+<arg0>
+<sanMarCustomerNumber>SanMarCustomerNumber</sanMarCustomerNumber>
+<sanMarUserName>SanMar.comUsername</sanMarUserName>
+<sanMarUserPassword>SanMar.comPassword</sanMarUserPassword>
+<senderId>?</senderId> //Do Not Use
+<senderPassword>?</senderPassword> //Do Not Use
+</arg0>
+
+25
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar getProductBulkInfo and getProductDeltaInfo Response Parameters
+#
+
+A
+
+Field Name
+
+Description
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+
+A
+B
+C
+D
+E
+F
+G
+H
+I
+J
+K
+L
+M
+N
+O
+P
+Q
+R
+S
+T
+U
+V
+W
+X
+Y
+Z
+AA
+AB
+AC
+AD
+AE
+AF
+AG
+AH
+
+UNIQUE_KEY
+PRODUCT_TITLE
+PRODUCT_DESCRIPTION
+STYLE#
+AVAILABLE_SIZES
+BRAND_LOGO_IMAGE
+THUMBNAIL_IMAGE
+COLOR_SWATCH_IMAGE
+PRODUCT_IMAGE
+SPEC_SHEET
+FRONT_FLAT
+BACK_FLAT
+FRONT_MODEL
+BACK_MODEL
+SIDE_MODEL
+THREE_Q_MODEL
+PRICE_TEXT
+COLOR_NAME
+COLOR_SQUARE_IMAGE
+COLOR_PRODUCT_IMAGE
+COLOR_PRODUCT_IMAGE_THUMBNAIL
+SIZE
+PIECE_WEIGHT
+PIECE_PRICE
+DOZEN_PRICE
+CASE_PRICE
+PIECE_SALE_PRICE
+DOZEN_SALE_PRICE
+CASE_SALE_PRICE
+SALE_START_DATE
+SALE_END_DATE
+CASE_SIZE
+INVENTORY_KEY
+SIZE_INDEX
+
+35
+36
+
+AI
+AJ
+
+CATALOG_COLOR
+PRICE_CODE
+
+37
+38
+39
+40
+41
+
+AK
+AL
+AM
+AN
+AO
+
+PRODUCT_STATUS
+TITLE_IMAGE
+BRAND_NAME
+KEYWORDS
+CATEGORY
+
+Unique Identifier created as combination of INVENTORY_KEY & SIZE_INDEX
+Includes Manufacturer’s name
+Description and product features
+Mill style # same as style number used in catalogs
+Sizes available
+URL Image Link to Brand logo Image
+URL Image Link to Small image for Front Model Image
+URL Image Link to Colors available image for colors available for each style
+URL Image Link to Front Model Image
+URL Image Link to PDF document listing specifications.
+URL Image Link to Front Flat Image
+URL Image Link to Back Flat Image
+URL Image Link to Front Model Image
+URL Image Link to Back Model Image
+URL Image Link to Side Model Image
+URL Image Link to Three Quarter Model Image
+Price applies to sizes text
+Color Name For website use
+URL Image Link to Color Square Image
+URL Image Link to Front Model Image for all colors
+Small image for Front Model Image for all colors
+Product Size
+Approximate Weight Per Piece in LBS
+Price Per Piece based on 5 pieces or less of a single style & color
+No longer used - Price Per Piece is displayed
+Price per piece based upon Purchase of a case of one style, Size & color
+Sale Price Per Piece based on 5 pieces or less of a single style & color
+No longer used – Sale Price Per Piece is displayed
+Sale Price per piece based upon Purchase of a case of one style, Size & color
+Sale Start Date
+Sale End Date
+Total # of pieces of a single one style, Size & color per case
+Proprietary Inventory Key for each one style, Size & color combination
+Size category number for each size grouping
+SanMar Mainframe Color Name for Ordering
+Suggested Retail Pricing Code (A/P = 50%, B/Q = 45%, C/R = 40%, D/S = 35%,
+E/T = 30%)
+Status of Product (Coming Soon, New, Regular, Discontinued)
+Empty (Not currently being used)
+Name of Manufacturer
+Product Keywords for website use
+Product Category
+
+26
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar getProductBulkInfo Service XML Response
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<ns2:getProductBulkInfoResponse xmlns:
+ns2="http://impl.webservice.integration.sanmar.com/">
+<return>
+<errorOccured>false</errorOccured>
+<message>Please access your file in the SanMarPI folder on our ftp server in
+sometime</message>
+</return>
+</ns2:getProductBulkInfoResponse>
+</S:Body>
+</S:Envelope>
+
+SanMar getProductDeltaInfo Service XML Response
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<ns2:getProductDeltaInfoResponse xmlns:
+ns2="http://impl.webservice.integration.sanmar.com/">
+<return>
+<errorOccured>false</errorOccured>
+<message>Please access your file in the SanMarPI folder on our ftp server in
+sometime</message>
+</return>
+</ns2:getProductDeltaInfoResponse>
+</S:Body>
+</S:Envelope>
+
+27
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar getProductInfoByBrand Service
+This service will return product data based on the brand provided in the request.
+Please note: Due to the data's size, a timeout may occur and may not return an XML response. In this scenario, our
+system will export the data to a CSV file in the SanMarPl FTP folder with the brand name and your customer
+number as part of the file name (i.e. SanMarPl-gildan-12345.csv)
+
+SanMar getProductInfoByBrand Service Request Parameters
+Field
+brand
+
+Description
+Brand Name
+
+Type
+STRING
+
+Required
+Yes
+
+Brand Names
+A4
+Allmade
+
+Carhartt
+Champion
+
+Gildan
+Hanes
+
+Sport-Tek
+Stanley/Stella
+
+Jerzees
+Mercer+Mettle
+New Era
+
+Outdoor Research
+Port &amp;
+Company
+Port Authority
+Rabbit Skins
+Red House
+
+Alternative Apparel
+American Apparel
+Anvil
+
+Comfort Colors
+CornerStone
+Cotopaxi
+
+Bella + Canvas
+Brooks Brothers
+Bulwark
+
+District
+Eddie Bauer
+Fruit of the Loom
+
+Next Level
+Nike
+OGIO
+
+Red Kap
+Russell Outdoors
+Spacecraft
+
+TravisMathew
+Volunteer Knitwear
+Wink
+
+tentree
+The North Face
+Tommy Bahama
+
+28
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar getProductInfoByBrand Service XML Request
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:impl="http://impl.webservice.integration.sanmar.com/">
+<soapenv:Header />
+<soapenv:Body>
+<impl:getProductInfoByBrand>
+<arg0>
+<brandName>OGIO</brandName>
+</arg0>
+<arg1>
+<sanMarCustomerNumber>5</sanMarCustomerNumber>
+<sanMarUserName>SanMarUsername</sanMarUserName>
+<sanMarUserPassword>SanMarPassword</sanMarUserPassword>
+</arg1>
+</impl:getProductInfoByBrand>
+</soapenv:Body>
+</soapenv:Envelope>
+
+SanMar getProductInfoByBrand Service XML Response
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<ns2:getProductInfoByBrandResponse xmlns:
+ns2="http://impl.webservice.integration.sanmar.com/">
+<return>
+<errorOccured>false</errorOccured>
+<listResponse>
+<productBasicInfo>
+<brandName>OGIO</brandName>
+<caseSize>6</caseSize>
+<catalogColor>Royal</catalogColor>
+<color>Royal</color>
+<inventoryKey>40199</inventoryKey>
+<keywords>, embroidery, embroider, embroidering, heat transfer,
+heat-transfer, heat transferring, heat-transferring, bags, bag,
+corporate city corp messenger, ogio, messenger bag, messenger, travel,
+adjustable, holiday, Holiday, gift,present, holiday gift, gifts for her,
+gifts for him, gift wrap, corporate gift,laptop sleeve,laptopsleeve,
+laptop-sleeve, laptop, organizer panel, organizer, organizer-panel,
+organizational panel,</keywords>
+<pieceWeight>3.72</pieceWeight>
+<productDescription>This large messenger is actually a mobile office that
+ditches the bottomless-pit syndrome and keeps multimedia organized and
+ready. 600D
+poly/420D dobby poly
+Padded top drop-in laptop sleeve
+Large main compartment
+media/audio pocket with headphone exit port
+Detachable, adjustable, padded shoulder strap
+Pullman handle attachment
+sleeve
+Deluxe organization panel
+Interior file separators Laptop
+sleeve: 11"h x 17"w x 2"d; fits most 17" laptops Dimensions: 13"h x 18"w
+x 6"d
+Capacity: 1,500 cu.in./24.6 L
+Weight: 3.42 lbs./1.6 kg
+Note: Bags not intended for use by children 12 and under. Includes a
+California Prop 65 and social responsibility hangtag.</productDescription>
+
+29
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar getProductInfoByBrand Service XML Response Continued
+<productStatus>Active</productStatus>
+<productTitle>OGIO - Corporate City Corp Messenger. 711207</productTitle>
+<size>OSFA</size>
+<sizeIndex>3</sizeIndex>
+<style>711207</style>
+<uniqueKey>401993</uniqueKey>
+<category>Bags</category>
+</productBasicInfo>
+<productImageInfo>
+<brandLogoImage>https://cdnm.sanmar.com/catalog/images/ogioheader.jpg
+</brandLogoImage>
+<colorProductImage>https://cdnm.sanmar.com/catalog/images/imglib/
+catl/2012/f11/711207_Royal_GA13.jpg</colorProductImage>
+<colorProductImageThumbnail>https://cdnm.sanmar.com/cache/altview/imglib/
+catl/2012/f11/711207_Royal_GA13.jpg</colorProductImageThumbnail>
+<colorSquareImage>https://cdnm.sanmar.com/swatch/gifs/ogio_royal.gif
+</colorSquareImage>
+<colorSwatchImage>https://cdnm.sanmar.com/catalog/images/711207sw.jpg
+</colorSwatchImage>
+<productImage>https://cdnm.sanmar.com/catalog/images/711207.jpg
+</productImage>
+<specSheet>https://www.apparelvideos.com/images/specsheet/pdf/specsheet/
+711207_specsheet.pdf</specSheet>
+<thumbnailImage>https://cdnm.sanmar.com/catalog/images/711207TN.jpg
+</thumbnailImage>
+<titleImage />
+<frontModel>https://cdnm.sanmar.com/imglib/mresjpg/2012/f11/
+711207_Royal_GA13.jpg</frontModel>
+<backModel />
+<sideModel />
+<backFlat />
+<frontFlat />
+<threeQModel />
+</productImageInfo>
+<productPriceInfo>
+<casePrice>42.9</casePrice>
+<dozenPrice>46.9</dozenPrice> // Dozens Price Is no longer available and
+reflects piece price.
+<piecePrice>46.9</piecePrice>
+<priceCode>C/R</priceCode>
+<priceText>Price</priceText>
+</productPriceInfo>
+</listResponse> // List continues with additional styles under brand category.
+<message>Product Info sent successfully.</message>
+</return>
+</ns2:getProductInfoByBrandResponse>
+</S:Body>
+</S:Envelope>
+
+30
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar getProductInfoByCategory Service
+This service returns a list of products and related data based on the requested category.
+Please note: Due to the data's size, a timeout may occur and may not return an XML response. In this scenario, our
+system will export the data to a CSV file in the SanMarPl FTP folder with the category name and your customer
+number as part of the file name (i.e. SanMarPl-Outerwear-12345.csv)
+
+SanMar getProductInfoByCategory Service Request Parameters
+Field
+Category
+
+Description
+SanMar Category Name; select one
+from the Category Names table below
+
+Type
+STRING
+
+Required
+Yes
+
+Category Names
+Activewear
+Accessories
+
+Infant &amp; Toddler
+Juniors &amp; Young Men
+
+Polos/Knits
+Sweatshirts/Fleece
+
+Women’s
+Workwear
+
+Bags
+Bottoms
+Caps
+
+Outerwear
+Personal Protection
+
+T-Shirts
+Tall
+
+Woven Shirts
+Youth
+
+SanMar getProductInfoByCategory Service XML Request
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:impl="http://impl.webservice.integration.sanmar.com/">
+<soapenv:Header />
+<soapenv:Body>
+<impl:getProductInfoByCategory>
+<arg0>
+<category>Caps</category>
+</arg0>
+<arg1>
+<sanMarCustomerNumber>SanMarCustomerNumber</sanMarCustomerNumber>
+<sanMarUserName>SanMarUsername</sanMarUserName>
+<sanMarUserPassword>SanMarPassword</sanMarUserPassword>
+<senderId>?</senderId>
+<senderPassword>?</senderPassword>
+</arg1>
+</impl:getProductInfoByCategory>
+</soapenv:Body>
+</soapenv:Envelope>
+
+31
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar getProductInfoByCategory Service XML Response
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<ns2:getProductInfoByCategoryResponse
+xmlns:ns2="http://impl.webservice.integration.sanmar.com/">
+<return>
+<errorOccured>false</errorOccured>
+<listResponse>
+<productBasicInfo>
+<brandName>Port Authority</brandName>
+<caseSize>144</caseSize>
+<catalogColor>Navy</catalogColor>
+<color>Navy</color>
+<inventoryKey>5547</inventoryKey>
+<keywords>embroidery, embroider, embroidering, screen printing,
+screen-printing, hook and loop, unstructured caps</keywords>
+<pieceWeight>0.26</pieceWeight>
+<productDescription>A timeless design with a soft, brushed feel.
+Fabric: 100% brushed cotton twill Structure: Unstructured
+Profile: Low Closure: Hidden tuck-in with hook and
+loop</productDescription>
+<productStatus>Active</productStatus>
+<productTitle>Port Authority Brushed Twill Cap. BTU</productTitle>
+<size>OSFA</size>
+<sizeIndex>3</sizeIndex>
+<style>BTU</style>
+<uniqueKey>55473</uniqueKey>
+</productBasicInfo>
+<productImageInfo>
+<brandLogoImage>https://cdnm.sanmar.com/catalog/images/
+portauthorityheader.jpg</brandLogoImage>
+<colorProductImage>https://cdnm.sanmar.com/catalog/images/imglib/
+catl/BTU_Navy_GA10.jpg</colorProductImage>
+<colorProductImageThumbnail>https://cdnm.sanmar.com/cache/altview/
+imglib/catl/BTU_Navy_GA10.jpg</colorProductImageThumbnail>
+<colorSquareImage>https://cdnm.sanmar.com/swatch/gifs/port_navy.gif
+</colorSquareImage>
+<colorSwatchImage>https://cdnm.sanmar.com/catalog/images/BTUsw.jpg
+</colorSwatchImage>
+<productImage>https://cdnm.sanmar.com/catalog/images/BTU.jpg
+</productImage>
+<specSheet>https://www.apparelvideos.com/images/specsheet/pdf/
+specsheet/BTU_specsheet.pdf</specSheet>
+<thumbnailImage>https://cdnm.sanmar.com/catalog/images/BTUTN.jpg
+</thumbnailImage>
+<titleImage />
+<frontModel>https://cdnm.sanmar.com/imglib/mresjpg/BTU_Navy_GA10.jpg
+</frontModel>
+<backModel />
+<sideModel />
+<backFlat>https://cdnm.sanmar.com/imglib/mresjpg/BTU_Navy_Back_GA10.jpg
+</backFlat>
+<frontFlat>https://cdnm.sanmar.com/imglib/mresjpg/2015/f23/BTU_navy_
+
+32
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar getProductInfoByCategory Service XML Response Continued
+full_front.jpg</frontFlat>
+<threeQModel />
+</productImageInfo>
+<productPriceInfo>
+<casePrice>3.09</casePrice>
+<dozenPrice>4.09</dozenPrice>
+<piecePrice>4.09</piecePrice>
+<priceCode>A/P</priceCode>
+<priceText>Price</priceText>
+</productPriceInfo>
+</listResponse>
+//Truncated//
+<message>Product Info sent successfully.</message>
+</return>
+</ns2:getProductInfoByCategoryResponse>
+</S:Body>
+</S:Envelope>
+
+33
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar getProductInfoByStyleColorSize Service
+This service returns all the product data related to the request. You may search by:
+style, style-color-size, style-color, or style-size.
+
+SanMar getProductInfoByStyleColorSize Service Request Parameters
+Field
+style
+color
+size
+
+Required
+Yes
+No
+No
+
+Type
+STRING
+STRING
+STRING
+
+Description
+STYLE# - Example: K500
+CATALOGCOLOR - Example: Black
+SIZE - Example: XL
+
+SanMar getProductInfoByStyleColorSize XML Request
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:impl="http://impl.webservice.integration.sanmar.com/">
+<soapenv:Header />
+<soapenv:Body>
+<impl:getProductInfoByStyleColorSize>
+<!--Zero or more repetitions:-->
+<arg0>
+<style>pc61</style>
+<size>S</size>
+<color>White</color>
+</arg0>
+<arg1>
+<sanMarCustomerNumber>SanMarCustomerNumber</sanMarCustomerNumber>
+<sanMarUserName>SanMarUsername</sanMarUserName>
+<sanMarUserPassword>SanMarPassword</sanMarUserPassword>
+<senderId>?</senderId>
+<senderPassword>?</senderPassword>
+</arg1>
+</impl:getProductInfoByStyleColorSize>
+</soapenv:Body>
+</soapenv:Envelope>
+
+34
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar getProductInfoByStyleColorSize Service Response Parameters
+
+Field
+
+Description
+Available Sizes
+
+availableSizes
+brandName
+
+Example
+Adult Sizes: XS-6XL, Youth Sizes: XS(2-4) S(6-8) M(1012) L(14- 16) XL(18-20)
+Port Authority, Hanes, Sport-Tek, Jerzees
+
+caseSize
+
+36, 12, 72
+
+Size of the case –
+number of
+pieces in one case
+
+catalogColor
+
+White, Athletic Hthr, Ath. Maroon
+
+SanMar
+Mainframe Color
+
+color
+
+White, Athletic Heather, Athletic Maroon
+
+Full Color Name
+
+inventoryKey
+
+10566
+
+SanMar
+Product Identifier
+
+keywords
+
+polo, polos, xs, s, m, l, xl, 2xl, 3xl, 4xl, 5xl, 6xl, xxl, xxxl,
+xxxxl, xxxxxl, xxxxxxl, 420, button,
+knit, pique
+
+pieceWeight
+
+0.6094
+
+productDescription
+
+productStatus
+productTitle
+
+Brand Name
+
+Product Keywords
+Approximate Weight
+Per Piece – lbs.
+/piece – Final weight
+determined at shipping.
+
+A favorite year after year this polo’s are known for
+their exceptional range of colors styles and sizes. The
+soft pique knit is shrink-resistant and easy to care for
+so your group will always lookitsbest. 7-ounce 100%
+Product Description
+ring spun combed cotton heavyweight pique
+and features
+(preshrunk) Garment washed
+for softness Double-needle stitching throughout Flat knit
+collar and cuffs Horn-tone buttons Locker patch Side
+vents
+Active, Discontinued, New, Coming Soon, Regular
+Status of Product
+
+size
+
+Port Authority - Pique Knit
+Polo. K420, JERZEES - Youth
+XS, S, M, L, XL, 2XL
+
+sizeIndex
+
+1, 2, 3,4,5
+
+Y or N (Yes or No)
+Product Size Identifier
+1-5 represents
+XS-XL as well as 2Xl6XL
+
+35
+
+SanMar Web Services Integration Guide v24.1
+
+style
+
+K420, PC61
+
+uniqueKey
+
+105661
+
+brandLogoImage
+
+http://cdn.sanmar.com/catalog/images/portauthorityhead er.jpg
+
+colorProductImage
+
+http://cdn.sanmar.com/catalog/images/imglib/catl/PC61_
+White_Model_Front_2010.jpg
+
+ColorProductImageThum
+bnail
+
+http://cdn.sanmar.com/cache/altview/imglib/catl/PC61_
+White_Model_Front_2010.jpg
+
+colorSquareImage
+
+colorSwatchImage
+
+http://cdn.sanmar.com/catalog/images/PC61sw.jpg
+
+productImage
+
+http://cdn.sanmar.com/catalog/images/PC61.jpg
+
+specSheet
+
+https://ws.sanmar.com:8080/SanMarWebService/servlet/
+SpecSheetController?specSheetName=PC61.pdf
+
+thumbnailImage
+
+105661
+
+titleImage
+frontModel
+
+Not Used
+29M_White_Model_Front_082510.jpg
+
+backModel
+
+http://cdn.sanmar.com/imglib/mresjpg/2014/f13/5170_te
+al_model_back_072014.jpg
+
+sideModel
+
+http://cdn.sanmar.com/imglib/mresjpg/2014/f13/5170_w
+hite_model_side_072014.jpg
+
+STYLE# Example K500
+Unique
+Product
+Identifier
+(Inventory Key
++ Size Index)
+URL Image Link
+to Brand Logo
+Image
+URL Image Link
+to Front Model
+Image
+URL Image Link
+to Small image
+for Front
+Model Image
+URL Image Link
+to Color of
+product
+URL Image Link
+to Colors
+available
+image for
+colors
+available for
+each style
+Main Product
+Image
+URL Image Link
+to PDF
+document
+listing
+specifications.
+URL Image Link
+to Small image
+for Front
+Model Image
+URL Image Link
+to Front Model
+Image
+URL Image Link
+to Back Model
+Image
+URL Image Link
+to Side Model
+Image
+
+36
+
+SanMar Web Services Integration Guide v24.1
+
+backFlat
+
+frontFlat
+
+threeQModel
+
+casePrice
+
+caseSalePrice
+
+dozenPrice
+
+dozenSalePrice
+
+piecePrice
+
+pieceSalePrice
+
+priceCode
+priceText
+saleEndDate
+saleStartDate
+
+http://cdn.sanmar.com/imglib/mresjpg/29M_White_Flat_
+Back_2009.jpg
+
+URL Image Link
+to Back Flat
+Image
+URL Image Link
+http://cdn.sanmar.com/imglib/mresjpg/2015/f6/29M_whi
+te_flat_front.jpg
+to Front Flat
+Image
+http://cdn.sanmar.com/imglib/mresjpg/2014/f13/5170_white_ URL Image Link
+model_3q_072014.jpg
+to Three
+Quarter Model
+Image
+1.76
+Price per piece
+based upon
+Purchase of
+a case of one
+style, size &
+color
+Sale Price per
+99.36
+piece based
+upon Purchase
+of a case of
+one style, size
+& color
+No Longer Used – Displays Piece Price 2.76
+No Longer
+Used –
+Displays Piece
+Price
+No Longer Used – Displays Piece Price 2.76
+Price Per Piece
+based on 6
+pieces or
+more of a
+single style,
+size & color
+Price Per Piece
+2.76
+based on 5
+pieces or
+less of a single
+style & color
+1.38
+Sale Price Per
+Piece based on
+5 pieces or less
+of a single
+style & color
+A
+Price Text
+Manufacture
+Price applies to sizes XS-XL
+Pricing Code
+2015-09-20
+Sale End Date
+2015-09-14
+Sale Start Date
+
+37
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar getProductInfoByStyleColorSize Service XML Response
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<ns2:getProductInfoByStyleColorSizeResponse
+xmlns:ns2="http://impl.webservice.integration.sanmar.com/">
+<return>
+<errorOccured>false</errorOccured>
+<listResponse>
+<productBasicInfo>
+<availableSizes>Adult Sizes: S-6XL</availableSizes>
+<brandName>Port &amp; Company</brandName>
+<caseSize>72</caseSize>
+<catalogColor>White</catalogColor>
+<color>White</color>
+<inventoryKey>11803</inventoryKey>
+<keywords>embroidery, embroider, embroidering, screen printing,
+screenprinting, screen-printing, screen print, screenprint, screenprint, heat transfer, heat transfering, heat-transfering, heat
+seal, heat sealing, heat-sealing, heat-transfer, heat-seal,
+heattransfer, heatseal, pad print, pad printing, pad-printing, padprint, padprint, padprinting, male, males,Short sleeve, short
+sleeves, short sleeved, shortsleeve, shortsleeves, shortsleeved,
+short-sleeve, short-sleeves, short-sleeved,t shirt, t-shirt,
+tshirt, t shirts, t-shirts, tshirts, tee shirt, teeshirt, teeshirt, heavyweight, heavy weight heavy-weight, preshrunk, preshrunk, pre shrunk, best seller, soft, comfortable, cotton, 100%
+cotton, xs, s, m, l, xl, 2xl, 3xl, 4xl, 5xl, 6xl, xxl, xxxl,
+xxxxl, xxxxxl, xxxxxxl,men, men's, mens,</keywords>
+<pieceWeight>0.38</pieceWeight>
+<productDescription>A year-round essential, our best-selling tshirt has been voted "most popular" by groups, teams, clubs and
+schools across America.
+6.1-ounce, 100% soft spun cotton
+98/2 cotton/poly (Ash)
+90/10 cotton/poly (Athletic
+Heather)
+50/50 cotton/poly (Dark Heather Grey)
+Removable
+tag for comfort and relabeling</productDescription>
+<productStatus>Active</productStatus>
+<productTitle>Port &amp; Company - Essential Tee.
+PC61</productTitle>
+<size>S</size>
+<sizeIndex>2</sizeIndex>
+<style>PC61</style>
+<uniqueKey>118032</uniqueKey>
+<category>T-Shirts</category>
+</productBasicInfo>
+<productImageInfo>
+<brandLogoImage>https://cdnm.sanmar.com/catalog/images/
+portandcompanyheader.jpg</brandLogoImage>
+<colorProductImage>https://cdnm.sanmar.com/catalog/images/
+imglib/catl/2016/f17/PC61_white_model_front_102016.jpg
+</colorProductImage>
+<colorProductImageThumbnail>https://cdnm.sanmar.com/
+cache/altview/imglib/catl/2016/f17/PC61_white_model_
+front_102016.jpg</colorProductImageThumbnail>
+<colorSquareImage>https://cdnm.sanmar.com/swatch/gifs/
+port_white.gif</colorSquareImage>
+<colorSwatchImage>https://cdnm.sanmar.com/catalog/images/
+PC61sw.jpg</colorSwatchImage>
+
+38
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar getProductInfoByStyleColorSize Service XML Response
+<productImage>https://cdnm.sanmar.com/catalog/images/
+PC61.jpg</productImage>
+<specSheet>https://www.apparelvideos.com/images/specsheet/
+pdf/specsheet/PC61_specsheet.pdf</specSheet>
+<thumbnailImage>https://cdnm.sanmar.com/catalog/images/
+PC61TN.jpg</thumbnailImage>
+<titleImage />
+<frontModel>https://cdnm.sanmar.com/imglib/mresjpg/
+2016/f17/PC61_white_model_front_102016.jpg</frontModel>
+<backModel>https://cdnm.sanmar.com/imglib/mresjpg/
+2016/f17/PC61_white_model_back_102016.jpg</backModel>
+<sideModel>https://cdnm.sanmar.com/imglib/mresjpg/
+2016/f17/PC61_white_model_side_102016.jpg</sideModel>
+<backFlat>https://cdnm.sanmar.com/imglib/mresjpg/
+2012/f1/PC61_White_back_FS06.jpg</backFlat>
+<frontFlat>https://cdnm.sanmar.com/imglib/mresjpg/
+2012/f1/PC61_White_Flat_Front_2009.jpg</frontFlat>
+<threeQModel>https://cdnm.sanmar.com/imglib/mresjpg/
+2016/f17/PC61_white_model_3q_102016.jpg</threeQModel>
+</productImageInfo>
+<productPriceInfo>
+<casePrice>2.84</casePrice>
+<caseSalePrice>2.38</caseSalePrice>
+<dozenPrice>3.84</dozenPrice>
+<dozenSalePrice>2.38</dozenSalePrice>
+<piecePrice>3.84</piecePrice>
+<pieceSalePrice>2.38</pieceSalePrice>
+<priceCode>A/P</priceCode>
+<priceText>Price applies to sizes S-XL</priceText>
+<saleEndDate>2023-05-06</saleEndDate>
+<saleStartDate>2023-05-01</saleStartDate>
+</productPriceInfo>
+</listResponse>
+<message>Product Info sent successfully.</message>
+</return>
+</ns2:getProductInfoByStyleColorSizeResponse>
+</S:Body>
+</S:Envelope>
+
+39
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards - Product Data Services V2.0.0
+TEST: https://test-ws.sanmar.com:8080/promostandards/ProductDataServiceV2.xml?wsdl
+PRODUCTION: https://ws.sanmar.com:8080/promostandards/ProductDataServiceV2.xml?wsdl
+There are four functions available for this web service.
+getProduct
+getProductCloseOut
+getProductDateModified
+getProductSellable
+
+40
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards GetProduct V2.0.0 Service
+This function will provide detailed product data based on a specific ProductId or any additional subset
+filtering provided at the request. Information includes GTIN, PMS colors and companion details.
+
+PromoStandards GetProduct V2.0.0 Service Request Parameters
+Field
+
+Description
+
+Example
+
+Required Type
+
+wsVersion
+id
+
+Promostandard Version
+SanMar.com Username
+
+2.0.0
+SanMarUsername
+
+Yes
+Yes
+
+STRING
+STRING
+
+Max
+Chars
+64
+64
+
+password
+localizationCountry
+localizationLanguage
+productId
+partId
+colorName
+
+SanMar.com Password
+Country Code
+Language Code
+SanMar Style#
+SanMar Unique Key
+SanMar Mainframe or catalog
+color Name
+To collect data for a specific size
+productId
+& partId are required
+
+SanMarPassword
+us
+en
+PC61
+175762
+Aquatic Blue
+
+Yes
+Yes
+Yes
+Yes
+No
+No
+
+STRING
+STRING
+STRING
+STRING
+STRING
+STRING
+
+64
+2
+2
+64
+64
+64
+
+ApparelSizeArray
+
+*apparelStyle
+
+Product Type
+
+*labelSize
+
+Product Size: CUSTOM for Pants
+and Ladies XXL Sizes
+Pant Sizes|Ex: 2737 or XS - 6XL
+
+*customSize
+
+No
+
+Unisex,
+Mens,
+Womens,
+Youth,
+MensTall
+XS - 6XL
+
+No
+
+STRING
+
+64
+
+No
+
+STRING
+
+64
+
+No
+
+No
+
+STRING
+
+64
+
+*Case Sensitive
+
+41
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards GetProduct V2.0.0 Service XML Request
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:ns="http://www.promostandards.org/WSDL/ProductDataService/2.0.0/"
+xmlns:shar="http://www.promostandards.org/WSDL/ProductDataService/2.0.0/SharedObjects/
+">
+<soapenv:Header />
+<soapenv:Body>
+<ns:GetProductRequest>
+<shar:wsVersion>2.0.0</shar:wsVersion>
+<shar:id>SanMarUsername</shar:id>
+<shar:password>SanMarPassword</shar:password>
+<shar:localizationCountry>us</shar:localizationCountry>
+<shar:localizationLanguage>en</shar:localizationLanguage>
+<shar:productId>MM1000</shar:productId>
+<shar:partId>1878771</shar:partId>
+<shar:colorName>DeepBlack</shar:colorName>
+<shar:ApparelSizeArray>
+<shar:ApparelSize>
+<shar:apparelStyle>Mens</shar:apparelStyle>
+<shar:labelSize>S</shar:labelSize>
+<shar:customSize>S</shar:customSize>
+</shar:ApparelSize>
+</shar:ApparelSizeArray>
+</ns:GetProductRequest>
+</soapenv:Body>
+</soapenv:Envelope>
+
+42
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards GetProduct Data V2.0.0 Service Response Parameters
+Field
+
+Description
+
+Data Type
+
+Required
+
+productId
+
+The associated product.
+
+64
+STRING
+
+Yes
+
+productName
+
+The Supplier name for the product
+
+256
+STRING
+
+Yes
+
+description
+
+Basic product description or bulleted list of
+descriptions.
+
+2048
+STRING
+ARRAY
+Array of keywords often used in searching for OBJECT
+this
+ARRAY
+product. An array of ProductKeyword objects.
+
+Yes
+
+productBrand
+
+The specific product brand
+
+64
+STRING
+
+No
+
+export
+
+Product status for export
+
+NILLABLE
+BOOLEAN
+
+Yes
+
+ProductCategoryArray
+
+The product’s categorization array. An array of OBJECT
+ProductCategory objects.
+ARRAY
+
+No
+
+RelatedProductArray
+
+Products related to the quested product as
+Substitutable, CompanionSell, or Common
+Grouping (Family). An array of
+RelatedProduct objects.
+The URL of the product’s primary image. Any
+valid URL can be returned including prefixes
+like http and ftp.
+Marketing-oriented pricing information.
+Represented as an array of Product Price
+objects. Prices are List prices.
+All part specific product data. An array of
+ProductPart objects.
+
+OBJECT
+ARRAY
+
+No
+
+1024
+STRING
+
+No
+
+OBJECT
+ARRAY
+
+No
+
+OBJECT
+ARRAY
+
+Yes
+
+primaryColor
+
+The "go to market" color. Not used by
+SanMar
+
+OBJECT
+
+No
+
+standardColorName
+
+The Full Color Name which is a front-end
+64 STRING
+color name which should be displayed to end
+users. Supplied in SanMar_SDL_N.csv on FTP
+site in COLOR_NAME column.
+The PMS code representation. This is not a
+64 STRING
+supplement for product color.
+
+No
+
+The Mainframe or Catalog color - the
+backend color name to be used in the API
+
+Yes
+
+ProductKeywordArray
+
+primaryImageURL
+
+ProductPriceGroupArray
+
+ProductPartArray
+
+approximatePms
+colorName
+
+64 STRING
+
+No
+
+No
+
+43
+
+SanMar Web Services Integration Guide v24.1
+
+requests. Supplied in SanMar_SDL_N.csv file
+on FTP site in SANMAR_MAINFRAME_COLOR
+column.
+The date time stamp of the most recent
+change to this data in ISO 8601 format
+
+ISO 8601
+DATE
+
+Yes
+
+creationDate
+
+The date time stamp when this products data
+initially became available in ISO 8601 format
+
+ISO 8601
+DATE
+
+Yes
+
+endDate
+
+The Date this Product expires from Supplier
+availability in ISO 8601 format
+
+ISO 8601
+DATE
+
+No
+
+effectiveDate
+
+The Date this Product initially becomes
+available from the Supplier in ISO 8601
+format
+
+ISO 8601
+DATE
+
+No
+
+isCaution
+
+Cautionary status to review for specific
+warnings about using product data.
+
+NILLABLE
+BOOLEAN
+
+Yes
+
+cautionComment
+
+Product cautionary comments
+
+1024
+STRING
+
+No
+
+isCloseout
+
+Indicates if the product is Discontinued.
+Discontinued is the end of the SanMar
+Product Lifecycle.
+
+NILLABLE
+BOOLEAN
+
+Yes
+
+isOnDemand
+
+Manufactured on demand / Made to order.
+
+NILLABLE
+BOOLEAN
+
+Yes
+
+isHazmat
+
+Contains hazardous material. A nil value
+indicates this it is unknown or the data is not
+available by the supplier.
+
+NILLABLE
+BOOLEAN
+
+FobPointArray
+
+An array of FOB points object
+
+ARRAY
+
+lastChangeDate
+
+Yes
+
+44
+
+SanMar Web Services Integration Guide v24.1
+
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<ns2:GetProductResponse xmlns:ns2="http://www.promostandards.org
+/WSDL/ProductDataService/2.0.0/"xmlns="http://www.
+promostandards.org/WSDL/ProductDataService/2.0.0/SharedObjects/">
+<ns2:Product>
+<productId>MM1000</productId>
+<productName>MERCER+METTLE Stretch Heavyweight Pique
+Polo MM1000</productName>
+<description>Crafted in a heavier knit, this refined polo is just as
+comfortable as the classics from which it was inspired. The easymoving fabric offers moisture wicking when the heat is on. The black
+satin-finished rimmed buttons on the placket and back collar extend a
+style-forward feel on the outside, while a dyed-to-match satin-twill
+neck tape lines the inside.Fabric+Weight</description>
+<description>8.1-ounce, 58/39/3 cotton/poly/spandex diamond
+pique</description>
+<description>Features+Benefits</description>
+<description>Moisture-wicking</description>
+<description>Button-backed, ribbed collar</description>
+<description>Dyed-to-match satin twill neck tape</description>
+<description>2-button placket</description>
+<description>Rimmed, black satin-finished buttons</description>
+<description>Ribbed cuffs</description>
+<description>Notched vents</description>
+<priceExpiresDate xmlns:xsi="http://www.w3.org/2001/XMLSchemainstance" xsi:nil="true" />
+<ns2:ProductKeywordArray>
+<ProductKeyword>
+<keyword>Stretch</keyword>
+</ProductKeyword>
+<ProductKeyword>
+<keyword>Pique</keyword>
+</ProductKeyword>
+<ProductKeyword>
+<keyword>Polo</keyword>
+</ProductKeyword>
+<ProductKeyword>
+<keyword>Mercer</keyword>
+</ProductKeyword>
+<ProductKeyword>
+<keyword>Mettle</keyword>
+</ProductKeyword>
+<ProductKeyword>
+<keyword>Mercer and Mettle</keyword>
+</ProductKeyword>
+<ProductKeyword>
+<keyword>Mercer &amp; Mettle</keyword>
+</ProductKeyword>
+<ProductKeyword>
+<keyword>Mercer&amp;Mettle</keyword>
+</ProductKeyword>
+<ProductKeyword>
+<keyword>Mercer + Mettle</keyword>
+</ProductKeyword>
+
+45
+
+SanMar Web Services Integration Guide v24.1
+
+<ProductKeyword>
+<keyword>Mercer+Mettle</keyword>
+</ProductKeyword>
+<ProductKeyword>
+<keyword>MercerMettle</keyword>
+</ProductKeyword>
+<ProductKeyword>
+<keyword>Mercer Mettle</keyword>
+</ProductKeyword>
+</ns2:ProductKeywordArray>
+<productBrand>Mercer+Mettle</productBrand>
+<ns2:export>false</ns2:export>
+<ns2:ProductCategoryArray>
+<ProductCategory>
+<category>Polos/Knits</category>
+<subCategory>Cotton, Easy Care</subCategory>
+</ProductCategory>
+</ns2:ProductCategoryArray>
+<ns2:RelatedProductArray>
+<RelatedProduct>
+<relationType>Companion Sell</relationType>
+<productId>MM1000</productId>
+</RelatedProduct>
+</ns2:RelatedProductArray>
+<primaryImageUrl>https://cdnm.sanmar.com/catalog/images/MM1000.jpg
+</primaryImageUrl>
+<ns2:ProductPriceGroupArray>
+<ProductPriceGroup>
+<ProductPriceArray>
+<ProductPrice>
+<quantityMin>1</quantityMin>
+<quantityMax>2147483647</quantityMax>
+<price>24.98</price>
+</ProductPrice>
+</ProductPriceArray>
+<groupName>MSRP</groupName>
+<currency>USD</currency>
+</ProductPriceGroup>
+</ns2:ProductPriceGroupArray>
+<complianceInfoAvailable xmlns:xsi="http://www.w3.org/2001/
+XMLSchema-instance" xsi:nil="true" />
+<ns2:ProductPartArray>
+<ns2:ProductPart>
+<partId>1878771</partId>
+<ns2:primaryColor>
+<Color>
+<standardColorName>Deep Black</standardColorName>
+<colorName>Insignia Blue</colorName>
+</Color>
+</ns2:primaryColor>
+<ns2:ColorArray>
+<Color>
+<standardColorName>Deep Black</standardColorName>
+<approximatePms>BLACK C</approximatePms>
+<colorName>DeepBlack</colorName>
+
+46
+
+SanMar Web Services Integration Guide v24.1
+
+</Color>
+</ns2:ColorArray>
+<ApparelSize>
+<apparelStyle>Mens</apparelStyle>
+<labelSize>S</labelSize>
+</ApparelSize>
+<Dimension>
+<dimensionUom>FT</dimensionUom>
+<depth>0</depth>
+<height>0</height>
+<width>0</width>
+<weightUom>OZ</weightUom>
+<weight>11.52</weight>
+</Dimension>
+<gtin>00191265938235</gtin>
+<isRushService>false</isRushService>
+<ns2:ShippingPackageArray>
+<ShippingPackage>
+<packageType>Box</packageType>
+<quantity>36</quantity>
+<dimensionUom>IN</dimensionUom>
+<depth>23.50</depth>
+<height>10.00</height>
+<width>16.50</width>
+<weightUom>LB</weightUom>
+<weight>26.00</weight>
+</ShippingPackage>
+</ns2:ShippingPackageArray>
+<endDate xmlns:xsi="http://www.w3.org/2001/
+XMLSchema-instance" xsi:nil="true" />
+<effectiveDate>2023-04-20T16:35:43.653</effectiveDate>
+<isCloseout>false</isCloseout>
+<isCaution>false</isCaution>
+<isOnDemand>false</isOnDemand>
+<isHazmat>false</isHazmat>
+</ns2:ProductPart>
+</ns2:ProductPartArray>
+<ns2:lastChangeDate>2023-04-20T16:35:43.653</ns2:lastChangeDate>
+<ns2:creationDate>2021-09-01T08:05:34.297</ns2:creationDate>
+<endDate xmlns:xsi="http://www.w3.org/2001/
+XMLSCHEMA-INSTANCE" XSI:NIL="TRUE" />
+<effectiveDate>2023-04-20T16:35:43.653</effectiveDate>
+<isCaution>false</isCaution>
+<isCloseout>false</isCloseout>
+<FobPointArray>
+<FobPoint>
+<fobId>6</fobId>
+<fobCity>Jacksonville</fobCity>
+<fobState>FL</fobState>
+<fobPostalCode>32219</fobPostalCode>
+<fobCountry>USA</fobCountry>
+</FobPoint>
+<FobPoint>
+<fobId>4</fobId>
+<fobCity>Reno</fobCity>
+
+47
+
+SanMar Web Services Integration Guide v24.1
+
+<fobState>NV</fobState>
+<fobPostalCode>89441</fobPostalCode>
+<fobCountry>USA</fobCountry>
+</FobPoint>
+<FobPoint>
+<fobId>3</fobId>
+<fobCity>Dallas</fobCity>
+<fobState>TX</fobState>
+<fobPostalCode>75038</fobPostalCode>
+<fobCountry>USA</fobCountry>
+</FobPoint>
+<FobPoint>
+<fobId>2</fobId>
+<fobCity>Cincinnati</fobCity>
+<fobState>OH</fobState>
+<fobPostalCode>45069</fobPostalCode>
+<fobCountry>USA</fobCountry>
+</FobPoint>
+<FobPoint>
+<fobId>5</fobId>
+<fobCity>Robbinsville</fobCity>
+<fobState>NJ</fobState>
+<fobPostalCode>08691</fobPostalCode>
+<fobCountry>USA</fobCountry>
+</FobPoint>
+<FobPoint>
+<fobId>12</fobId>
+<fobCity>Phoenix</fobCity>
+<fobState>AZ</fobState>
+<fobPostalCode>85323</fobPostalCode>
+<fobCountry>USA</fobCountry>
+</FobPoint>
+<FobPoint>
+<fobId>7</fobId>
+<fobCity>Minneapolis</fobCity>
+<fobState>MN</fobState>
+<fobPostalCode>55379</fobPostalCode>
+<fobCountry>USA</fobCountry>
+</FobPoint>
+</FobPointArray>
+</ns2:Product>
+</ns2:GetProductResponse>
+</S:Body>
+</S:Envelope>
+
+48
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards GetProductCloseOut V2.0.0 Service
+This service returns a list of Product Ids and Part Ids for all items which are in SanMar Discontinued status.
+
+PromoStandards GetProductCloseOut Data V2.0.0 Service Request Parameters
+Field
+wsVersion
+id
+password
+
+Description
+Promostandard Version
+SanMar.com Username
+SanMar.com Password
+
+Example
+2.0.0
+SanMarUsername
+SanMarPassword
+
+Required
+Yes
+Yes
+Yes
+
+Type
+STRING
+STRING
+STRING
+
+Max Chars
+64
+64
+64
+
+PromoStandards GetProductCloseOut V2.0.0 Service XML Request
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:ns="http://www.promostandards.org/WSDL/ProductDataService/2.0.0/" xmlns:
+shar="http://www.promostandards.org/WSDL/ProductDataService/2.0.0/SharedObjects/">
+<soapenv:Header />
+<soapenv:Body>
+<ns:GetProductCloseOutRequest>
+<shar:wsVersion>2.0.0</shar:wsVersion>
+<shar:id>SanMarUsername</shar:id>
+<shar:password>SanMarPassword</shar:password>
+</ns:GetProductCloseOutRequest>
+</soapenv:Body>
+</soapenv:Envelope>
+
+PromoStandards GetProductCloseOut V2.0.0 Service Response Parameters
+Field
+productId
+partId
+
+Description
+SanMar Style #
+SanMar Unique_Key
+
+Example
+PC61
+179603
+
+Type
+STRING
+STRING
+
+Max Chars
+64
+64
+
+PromoStandards GetProduct Data V2.0.0 Service XML Response
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<ns2:GetProductCloseOutResponse xmlns:ns2="http://www.promostandards.
+org/WSDL/ProductDataService/2.0.0/" xmlns="http://www.promostandards.
+org/WSDL/ProductDataService/2.0.0/SharedObjects/">
+<ns2:ProductCloseOutArray>
+<ns2:ProductCloseOut>
+<productId>DM104CL</productId>
+<partId>764961</partId>
+</ns2:ProductCloseOut>
+</ns2:ProductCloseOutArray>
+</ns2:GetProductCloseOutResponse>
+</S:Body>
+</S:Envelope>
+
+49
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards GetProductDateModified V2.0.0 Service
+This service returns a list of Product Id’s and Part Id’s for all items that have changed since the date
+provided in the request.
+
+PromoStandards GetProductDateModified V2.0.0 Service Request Parameters
+Field
+
+Description
+
+Example
+
+Required
+
+Type
+
+wsVersion
+
+Promostandard
+Version
+SanMar.com
+Username
+SanMar.com Password
+
+2.0.0
+
+Yes
+
+STRING
+
+Max
+Chars
+64
+
+SanMarUsername
+
+Yes
+
+STRING
+
+64
+
+SanMarPassword
+
+Yes
+Yes
+
+STRING
+ISO
+8601
+
+64
+30
+
+id
+password
+changeTimeStamp
+
+2017-12-12T00:00:00.00008:00
+
+PromoStandards GetProductDateModified V2.0.0 Service XML Request
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:ns="http://www.promostandards.org/WSDL/ProductDataService/2.0.0/" xmlns
+:shar="http://www.promostandards.org/WSDL/ProductDataService/2.0.0/SharedObjects/">
+<soapenv:Header />
+<soapenv:Body>
+<ns:GetProductDateModifiedRequest>
+<shar:wsVersion>2.0.0</shar:wsVersion>
+<shar:id>SanMarUsername</shar:id>
+<shar:password>SanMarPassword</shar:password>
+<shar:changeTimeStamp>2017-12-12T00:00:00.00008:00</shar:changeTimeStamp>
+</ns:GetProductDateModifiedRequest>
+</soapenv:Body>
+</soapenv:Envelope>
+
+PromoStandards GetProductDateModified V2.0.0 Service Response Parameters
+Field
+productId
+partId
+
+Description
+SanMar Style #
+SanMar Unique_Key
+
+Example
+PC61
+179603
+
+Type
+STRING
+STRING
+
+Max Chars
+64
+64
+
+50
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards GetProductDateModified V2.0.0 Service XML Response
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<ns2:GetProductDateModifiedResponse xmlns:ns2="http://www.promostandards
+.org/WSDL/ProductDataService/2.0.0/"xmlns="http://www.
+promostandards.org/WSDL/ProductDataService/2.0.0/SharedObjects/">
+<ns2:ProductDateModifiedArray>
+<ns2:ProductDateModified>
+<productId>12000</productId>
+<partId>256202</partId>
+</ns2:ProductDateModified>
+</ns2:ProductDateModifiedArray>
+</ns2:GetProductDateModifiedResponse>
+</S:Body>
+</S:Envelope>
+
+51
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards GetProductSellable V2.0.0 Service
+This service returns a list of Product Ids and Part Ids along with their status of available to sell (Sellable
+TRUE or False).
+
+PromoStandards GetProductSellable V2.0.0 Request Parameters
+Field
+wsVersion
+id
+password
+productId
+partId
+isSellable
+
+Description
+Promostandard Version
+SanMar.com Username
+SanMar.com Password
+SanMar Style #
+SanMar Unique_Key
+True = sellable SKUs
+
+Example
+2.0.0
+
+PC61
+179603
+true or false
+
+Required
+Yes
+Yes
+Yes
+No
+No
+True
+
+Type
+STRING
+STRING
+STRING
+STRING
+STRING
+STRING
+
+Max Chars
+64
+64
+64
+64
+64
+64
+
+PromoStandards GetProductSellable V2.0.0 Service XML Request
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:ns="http://www.promostandards.org/WSDL/ProductDataService/2.0.0/" xmlns:
+shar="http://www.promostandards.org/WSDL/ProductDataService/2.0.0/SharedObjects/">
+<soapenv:Header />
+<soapenv:Body>
+<ns:GetProductSellableRequest>
+<shar:wsVersion>2.0.0</shar:wsVersion>
+<shar:id>SanMarUsername</shar:id>
+<shar:password>SanMarPassword</shar:password>
+<shar:productId>LOG105</shar:productId>
+<shar:isSellable>true</shar:isSellable>
+</ns:GetProductSellableRequest>
+</soapenv:Body>
+</soapenv:Envelope>
+
+PromoStandards GetProductSellable V2.0.0 Service Response Parameters
+Field
+productId
+partId
+
+Description
+SanMar Style #
+SanMar Unique_Key
+
+Example
+PC61
+179603
+
+Type
+STRING
+STRING
+
+Max Chars
+64
+64
+
+52
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards GetProductSellable V2.0.0 Service XML Response
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<ns2:GetProductSellableResponse xmlns:ns2="http://www.promostandards.
+org/WSDL/ProductDataService/2.0.0/"xmlns="http://www.promostandards.
+org/WSDL/ProductDataService/2.0.0/SharedObjects/">
+<ns2:ProductSellableArray>
+<ns2:ProductSellable>
+<productId>LOG105</productId>
+<partId>583921</partId>
+</ns2:ProductSellable>
+</ns2:ProductSellableArray>
+</ns2:GetProductSellableResponse>
+</S:Body>
+</S:Envelope>
+
+53
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards - Media Content Services V1.1.0
+TEST: https://test-ws.sanmar.com:8080/promostandards/MediaContentServiceBinding?wsdl
+PRODUCTION: https://ws.sanmar.com:8080/promostandards/MediaContentServiceBinding?wsdl
+There are two functions available for this web service. Please note: SanMar does not support the
+getMediaDateModified service.
+getMediaContent
+getMediaDateModified
+
+54
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards getMediaContent Service
+This service returns media content based off the media type in the request. SanMar Only Supports Image or
+Document Media Types, we do not support Audio or Video Media Types.
+
+PromoStandards getMediaContent Service Request Parameters
+Field
+
+Description
+
+Example
+
+Required
+
+Type
+
+wsVersion
+id
+password
+cultureName
+
+PromoStandards Version
+SanMar.com Username
+SanMar.com Password
+The language culture name. i.e. (language,
+units
+of measure, etc.) Null assumes en-US.
+The type of media to return: Image or
+Document.
+SanMar Style #
+SanMar Unique_Key
+1004 Swatch,1006 Primary,1007 Front,
+1008 Rear,2001 High
+
+1.1.0
+SanMarUsername
+SanMarPassword
+en-us
+
+Yes
+Yes
+Yes
+No
+
+STRING
+STRING
+STRING
+STRING
+
+Image or
+Document
+PC61
+179603
+
+Yes
+
+STRING
+
+Yes
+No
+
+STRING
+STRING
+
+1007
+
+No
+
+INT
+
+mediaType
+productId
+partId
+classType
+
+Max
+Chars
+64
+64
+64
+64
+
+64
+64
+
+PromoStandards getMediaContent Service XML Request
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:ns="http://www.promostandards.org/WSDL/MediaService/1.0.0/" xmlns:
+shar="http://www.promostandards.org/WSDL/MediaService/1.0.0/SharedObjects/">
+<soapenv:Header />
+<soapenv:Body>
+<ns:GetMediaContentRequest>
+<shar:wsVersion>1.1.0</shar:wsVersion>
+<shar:id>SanMarUsername</shar:id>
+<shar:password>SanMarPassword</shar:password>
+<shar:cultureName />
+<shar:mediaType>Image</shar:mediaType>
+<shar:productId>K420</shar:productId>
+<shar:partId>92032</shar:partId>
+<ns:classType>?</ns:classType>
+</ns:GetMediaContentRequest>
+</soapenv:Body>
+</soapenv:Envelope>
+
+55
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards getMediaContent Service Response Parameters
+Field
+
+Description
+
+Example
+
+Type
+
+productId
+partId
+
+SanMar Style#
+SanMar Unique
+Key
+The URL to the
+media
+location.
+The type of media
+(i.e. Image,
+Document, etc.)
+An array of
+ClassType objects
+that classify of the
+media
+
+PC61
+175762
+
+STRING
+STRING
+
+Max
+Chars
+64
+64
+
+https://cdnl.sanmar.com/catalog/images/K420.jpg
+
+STRING
+
+1024
+
+url
+
+mediaType
+
+classTypeId
+
+classTypeName
+color
+singlePart
+
+Color Name
+Identifies
+whether the
+partId one to
+one corresponds
+with
+the image.
+
+Image
+
+1006
+
+Primary
+Black
+
+64
+
+STRING
+
+64
+
+STRING
+BOOLEAN
+
+256
+
+True
+
+56
+
+SanMar Web Services Integration Guide v24.1
+
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<ns2:GetMediaContentResponse xmlns:ns2="http://www.promostandards.
+org/WSDL/MediaService/1.0.0/" xmlns="http://www.promostandards.
+org/WSDL/MediaService/1.0.0/SharedObjects/">
+<ns2:MediaContentArray>
+<ns2:MediaContent>
+<productId>K420</productId>
+<partId>92032</partId>
+<ns2:url>https://cdnm.sanmar.com/imglib/mresjpg/
+K420_Black_back_FS06.jpg</ns2:url>
+<mediaType>Image</mediaType>
+<ns2:ClassTypeArray>
+<ns2:ClassType>
+<ns2:classTypeId>1008</ns2:classTypeId>
+<ns2:classTypeName>Rear</ns2:classTypeName>
+</ns2:ClassType>
+</ns2:ClassTypeArray>
+<ns2:color>Black</ns2:color>
+<ns2:singlePart>true</ns2:singlePart>
+</ns2:MediaContent>
+<ns2:MediaContent>
+<productId>K420</productId>
+<partId>92032</partId>
+<ns2:url>https://cdnm.sanmar.com/imglib/mresjpg/
+K420_Black_front_FS06.jpg</ns2:url>
+<mediaType>Image</mediaType>
+<ns2:ClassTypeArray>
+<ns2:ClassType>
+<ns2:classTypeId>1007</ns2:classTypeId>
+<ns2:classTypeName>Front</ns2:classTypeName>
+</ns2:ClassType>
+</ns2:ClassTypeArray>
+<ns2:color>Black</ns2:color>
+<ns2:singlePart>true</ns2:singlePart>
+</ns2:MediaContent>
+<ns2:MediaContent>
+<productId>K420</productId>
+<partId>92032</partId>
+<ns2:url>https://cdnm.sanmar.com/catalog/images/K420.jpg</ns2:url>
+<mediaType>Image</mediaType>
+<ns2:ClassTypeArray>
+<ns2:ClassType>
+<ns2:classTypeId>1006</ns2:classTypeId>
+<ns2:classTypeName>Primary</ns2:classTypeName>
+</ns2:ClassType>
+</ns2:ClassTypeArray>
+<ns2:color>Black</ns2:color>
+<ns2:singlePart>true</ns2:singlePart>
+</ns2:MediaContent>
+
+57
+
+SanMar Web Services Integration Guide v24.1
+
+<ns2:MediaContent>
+<productId>K420</productId>
+<partId>92032</partId>
+<ns2:url>https://cdnm.sanmar.com/catalog/images/K420sw.jpg</ns2:url>
+<mediaType>Image</mediaType>
+<ns2:ClassTypeArray>
+<ns2:ClassType>
+<ns2:classTypeId>1004</ns2:classTypeId>
+<ns2:classTypeName>Swatch</ns2:classTypeName>
+</ns2:ClassType>
+</ns2:ClassTypeArray>
+<ns2:color>Black</ns2:color>
+<ns2:singlePart>true</ns2:singlePart>
+</ns2:MediaContent>
+<ns2:MediaContent>
+<productId>K420</productId>
+<partId>92032</partId>
+<ns2:url>https://cdnm.sanmar.com/imglib/mresjpg/2014/f13/
+K420_black_model_side_072014.jpg</ns2:url>
+<mediaType>Image</mediaType>
+<ns2:ClassTypeArray>
+<ns2:ClassType>
+<ns2:classTypeId>500</ns2:classTypeId>
+<ns2:classTypeName>Custom</ns2:classTypeName>
+</ns2:ClassType>
+</ns2:ClassTypeArray>
+<ns2:color>Black</ns2:color>
+<ns2:singlePart>true</ns2:singlePart>
+</ns2:MediaContent>
+<ns2:MediaContent>
+<productId>K420</productId>
+<partId>92032</partId>
+<ns2:url>https://cdnm.sanmar.com/imglib/mresjpg/2014/f13/
+K420_black_model_back_072014.jpg</ns2:url>
+<mediaType>Image</mediaType>
+<ns2:ClassTypeArray>
+<ns2:ClassType>
+<ns2:classTypeId>502</ns2:classTypeId>
+<ns2:classTypeName>Custom</ns2:classTypeName>
+</ns2:ClassType>
+</ns2:ClassTypeArray>
+<ns2:color>Black</ns2:color>
+<ns2:singlePart>true</ns2:singlePart>
+</ns2:MediaContent>
+<ns2:MediaContent>
+<productId>K420</productId>
+<partId>92032</partId>
+<ns2:url>https://cdnm.sanmar.com/imglib/mresjpg/2015/f18/
+K420_L420_Y420_model_GA16.jpg</ns2:url>
+<mediaType>Image</mediaType>
+<ns2:ClassTypeArray>
+
+58
+
+SanMar Web Services Integration Guide v24.1
+
+<ns2:ClassType>
+<ns2:classTypeId>503</ns2:classTypeId>
+<ns2:classTypeName>Custom</ns2:classTypeName>
+</ns2:ClassType>
+</ns2:ClassTypeArray>
+<ns2:color>Black</ns2:color>
+<ns2:singlePart>true</ns2:singlePart>
+</ns2:MediaContent>
+<ns2:MediaContent>
+<productId>K420</productId>
+<partId>92032</partId>
+<ns2:url>https://cdnm.sanmar.com/swatch/gifs/port_black.gif</ns2:url>
+<mediaType>Image</mediaType>
+<ns2:ClassTypeArray>
+<ns2:ClassType>
+<ns2:classTypeId>504</ns2:classTypeId>
+<ns2:classTypeName>Custom</ns2:classTypeName>
+</ns2:ClassType>
+</ns2:ClassTypeArray>
+<ns2:color>Black</ns2:color>
+<ns2:singlePart>true</ns2:singlePart>
+</ns2:MediaContent>
+<ns2:MediaContent>
+<productId>K420</productId>
+<partId>92032</partId>
+<ns2:url>https://cdnm.sanmar.com/imglib/mresjpg/2014/f17/
+K420_black_model_front_072014.jpg</ns2:url>
+<mediaType>Image</mediaType>
+<ns2:ClassTypeArray>
+<ns2:ClassType>
+<ns2:classTypeId>2001</ns2:classTypeId>
+<ns2:classTypeName>High</ns2:classTypeName>
+</ns2:ClassType>
+</ns2:ClassTypeArray>
+<ns2:color>Black</ns2:color>
+<ns2:singlePart>true</ns2:singlePart>
+</ns2:MediaContent>
+</ns2:MediaContentArray>
+</ns2:GetMediaContentResponse>
+</S:Body>
+</S:Envelope>
+
+59
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar Product Inventory Service
+TEST:
+https://test-ws.sanmar.com:8080/SanMarWebService/SanMarWebServicePort?wsdl
+PRODUCTION: https://ws.sanmar.com:8080/SanMarWebService/SanMarWebServicePort?wsdl
+
+There are two functions available for this web service.
+getInventoryQtyForStyleColorSize
+getInventoryQtyForStyleColorSizeByWhse
+This call now supports queries at the Style, Style /Color and Style/Size level. This method can help with reducing call
+volume and allowing a bulk call and response when updating product Inventory information in your system.
+
+Warehouse Locations
+WhseNo
+1
+2
+3
+4
+5
+6
+7
+12
+31
+
+City
+Seattle
+Cincinnati
+Dallas
+Reno
+Robbinsville
+Jacksonville
+Minneapolis
+Phoenix
+Richmond
+
+State
+WA
+OH
+TX
+NV
+NJ
+FL
+MN
+AZ
+VA
+
+60
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar getInventoryQtyForStyleColorSize Service
+This service returns a list of available quantities from all warehouses for the requested product. The return will
+display inventory by warehouse information in descending warehouse numerical order.
+Please Note: this service uses the Catalog_Color / Mainframe_Color in the query, not the Color_Name field.
+
+SanMar getInventoryQtyForStyleColorSize Service Request Parameters
+Field
+
+Description
+
+Example
+
+Type
+
+Required
+
+arg3
+
+Style
+
+K500
+
+STRING
+
+Y
+
+arg4
+
+Catalog Color /
+Mainframe
+Color
+
+Black
+
+STRING
+
+N
+
+arg5
+
+Size
+
+XL
+
+STRING
+
+N
+
+SanMar getInventoryQtyForStyleColorSize Service XML Request (by Style / Color / Size)
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:web="http://webservice.integration.sanmar.com/">
+<soapenv:Header />
+<soapenv:Body>
+<web:getInventoryQtyForStyleColorSize>
+<arg0>SanMarCustomerNumber</arg0>
+<arg1>SanMarUsername</arg1>
+<arg2>SanMarPassword</arg2>
+<arg3>L223</arg3>
+<arg4>Pearl Grey</arg4>
+<arg5>L</arg5>
+</web:getInventoryQtyForStyleColorSize>
+</soapenv:Body>
+</soapenv:Envelope>
+
+61
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar getInventoryQtyForStyleColorSize Service XML Response
+*The return will display inventory by warehouse information in descending warehouse
+numerical order.
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<ns2:getInventoryQtyForStyleColorSizeResponse xmlns:ns2=
+"http://webservice.integration.sanmar.com/">
+<return>
+<errorOccurred>false</errorOccurred>
+<listResponse xmlns:xs="http://www.w3.org/2001/XMLSchema"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:type="xs:int">92</listResponse>
+<listResponse xmlns:xs="http://www.w3.org/2001/XMLSchema"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:type="xs:int">547</listResponse>
+<listResponse xmlns:xs="http://www.w3.org/2001/XMLSchema"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:type="xs:int">1052</listResponse>
+<listResponse xmlns:xs="http://www.w3.org/2001/XMLSchema"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:type="xs:int">0</listResponse>
+<listResponse xmlns:xs="http://www.w3.org/2001/XMLSchema"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:type="xs:int">1061</listResponse>
+<listResponse xmlns:xs="http://www.w3.org/2001/XMLSchema"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:type="xs:int">351</listResponse>
+<listResponse xmlns:xs="http://www.w3.org/2001/XMLSchema"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:type="xs:int">1372</listResponse>
+<listResponse xmlns:xs="http://www.w3.org/2001/XMLSchema"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:type="xs:int">11</listResponse>
+<message>Inventory returned successfully</message>
+</return>
+</ns2:getInventoryQtyForStyleColorSizeResponse>
+</S:Body>
+</S:Envelope>
+
+62
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar getInventoryQtyForStyleColorSize Service XML Request (by Style)
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:web="http://webservice.integration.sanmar.com/">
+<soapenv:Header />
+<soapenv:Body>
+<web:getInventoryQtyForStyleColorSize>
+<arg0>SanMarCustomerNumber</arg0>
+<arg1>SanMarUsername</arg1>
+<arg2>SanMarPassword</arg2>
+<arg3>L223</arg3>
+</web:getInventoryQtyForStyleColorSize>
+</soapenv:Body>
+</soapenv:Envelope>
+
+SanMar getInventoryQtyForStyleColorSize Service XML Response
+This return format will apply to calls by Style, Style/Color and Style/Size.
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<ns2:getInventoryQtyForStyleColorSizeResponse xmlns:ns2=
+"http://webservice.integration.sanmar.com/">
+<return>
+<errorOccurred>false</errorOccurred>
+<message>Inventory returned successfully</message>
+<response xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:type="ns2:Inventory">
+<style>L223</style>
+<skus>
+<sku>
+<color>Amethyst Purpl</color>
+<size>XS</size>
+<whse>
+<whseID>1</whseID>
+<whseName>Seattle</whseName>
+<qty>17</qty>
+</whse>
+<whse>
+<whseID>2</whseID>
+<whseName>Cincinnati</whseName>
+<qty>56</qty>
+</whse>
+<whse>
+<whseID>3</whseID>
+<whseName>Dallas</whseName>
+<qty>45</qty>
+</whse>
+
+63
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar getInventoryQtyForStyleColorSize Service XML Response Continued
+<qty>12</qty>
+</whse>
+<whse>
+<whseID>5</whseID>
+<whseName>Robbinsville</whseName>
+<qty>7</qty>
+</whse>
+<whse>
+<whseID>6</whseID>
+<whseName>Jacksonville</whseName>
+<qty>26</qty>
+</whse>
+<whse>
+<whseID>7</whseID>
+<whseName>Minneapolis</whseName>
+<qty>45</qty>
+</whse>
+<whse>
+<whseID>12</whseID>
+<whseName>Phoenix</whseName>
+<qty>23</qty>
+</whse>
+</sku>
+<sku>
+<color>Amethyst Purpl</color>
+<size>S</size>
+<whse>
+<whseID>1</whseID>
+<whseName>Seattle</whseName>
+<qty>20</qty>
+</whse>
+</sku>
+--truncated-</skus>
+</response>
+</return>
+</ns2:getInventoryQtyForStyleColorSizeResponse>
+</S:Body>
+</S:Envelope>
+
+64
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar getInventoryQtyForStyleColorSizeByWhse Service
+This service returns a list of available quantities from all warehouses for the requested product and
+warehouse. Please refer to previous call examples for Style, Style/Color and Style/Size returns.
+
+SanMar getInventoryQtyForStyleColorSizeByWhse Service Request Parameters
+Field
+
+Description
+
+Example
+
+Type
+
+Required
+
+arg3
+
+Style
+
+K500
+
+STRING
+
+Y
+
+arg4
+
+Catalog Color /
+Mainframe Color
+
+Black
+
+STRING
+
+N
+
+arg5
+
+Size
+
+XL
+
+STRING
+
+N
+
+arg6
+
+Warehouse Number
+
+3
+
+STRING
+
+Y
+
+SanMar getInventoryQtyForStyleColorSizeByWhse Service XML Request
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:web="http://webservice.integration.sanmar.com/">
+<soapenv:Header />
+<soapenv:Body>
+<web:getInventoryQtyForStyleColorSize>
+<arg0>SanMarCustomerNumber</arg0>
+<arg1>SanMarUsername</arg1>
+<arg2>SanMarPassword</arg2>
+<arg3>K500</arg3>
+<arg4>Black</arg4>
+<arg5>XL</arg5>
+<arg6>3</arg6>
+</web:getInventoryQtyForStyleColorSize>
+</soapenv:Body>
+</soapenv:Envelope>
+
+SanMar getInventoryQtyForStyleColorSizeByWhse Service XML Response
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<ns2:getInventoryQtyForStyleColorSizeByWhseResponse
+xmlns:ns2="http://webservice.integration.sanmar.com/">
+<return>
+<errorOccurred>false</errorOccurred>
+<message>Inventory returned successfully</message>
+<response xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi=
+"http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:int">1500
+</response>
+</return>
+</ns2:getInventoryQtyForStyleColorSizeByWhseResponse>
+</S:Body>
+
+65
+
+SanMar Web Services Integration Guide v24.1
+
+</S:Envelope>
+
+66
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards – Inventory Services V2.0.0
+TEST: https://test-ws.sanmar.com:8080/promostandards/InventoryServiceBindingV2final?WSDL
+PRODUCTION: https://ws.sanmar.com:8080/promostandards/InventoryServiceBindingV2final?WSDL
+There is one function available for this web service. Please Note: SanMar does not support
+getFilterValues.
+
+getInventoryLevels
+
+67
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards getInventoryLevels V 2.0.0 Service
+This service returns product inventory levels for each warehouse. There are 3 query types for this
+service (listed below).
+
+PromoStandards getInventoryLevels V 2.0.0 Service Request Parameters
+Field
+
+Description
+
+Example
+
+Required
+
+Type
+
+Max Chars
+
+productId
+
+Style Number
+
+K420
+
+Yes
+
+VARCHAR
+
+64
+
+labelSize
+
+Product Size
+
+s, m, 3XL
+
+No
+
+VARCHAR
+
+64
+
+partColor
+
+Product Catalog Color Name
+
+white
+
+No
+
+VARCHAR
+
+64
+
+PromoStandards getInventoryLevels V 2.0.0 XML Request Queries
+There are 3 query types for this call.
+
+Query Type 1: Search Inventory by productid, labelSize, and partColor:
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:ns="http://www.promostandards.org/WSDL/Inventory/2.0.0/"
+xmlns:shar="http://www.promostandards.org/WSDL/Inventory/2.0.0/SharedObjects/">
+<soapenv:Header />
+<soapenv:Body>
+<ns:GetInventoryLevelsRequest>
+<shar:wsVersion>2.0.0</shar:wsVersion>
+<shar:id>SanMarUsername</shar:id>
+<shar:password>SanMarPassword</shar:password>
+<shar:productId>k420</shar:productId>
+<shar:Filter>
+<shar:LabelSizeArray>
+<shar:labelSize>s</shar:labelSize>
+</shar:LabelSizeArray>
+<shar:PartColorArray>
+<shar:partColor>white</shar:partColor>
+</shar:PartColorArray>
+</shar:Filter>
+</ns:GetInventoryLevelsRequest>
+</soapenv:Body>
+</soapenv:Envelope>
+
+68
+
+SanMar Web Services Integration Guide v24.1
+
+Query Type 2: Search Inventory by productid:
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:ns="http://www.promostandards.org/WSDL/Inventory/2.0.0/"
+xmlns:shar="http://www.promostandards.org/WSDL/Inventory/2.0.0/SharedObjects/">
+<soapenv:Header />
+<soapenv:Body>
+<ns:GetInventoryLevelsRequest>
+<shar:wsVersion>2.0.0</shar:wsVersion>
+<shar:id>SanMarUsername</shar:id>
+<shar:password>SanMarPassword</shar:password>
+<shar:productId>k420</shar:productId>
+</ns:GetInventoryLevelsRequest>
+</soapenv:Body>
+</soapenv:Envelope>
+
+69
+
+SanMar Web Services Integration Guide v24.1
+
+Query Type 3: Search Inventory by partIdArray
+This call no longer requires the ProductId and PartId to match; however, a valid ProductId must be
+supplied but will not be used as part of your search criteria if you supply PartId(s). The maximum amount of
+PartId’s you can supply per call is 200.
+Using multiple PartId’s can be useful if you are checking inventory as part of a checkout workflow process, as you
+can batch the entire contents of the cart into one call by PartId(s) rather than submitting individual queries for each
+ProductId.
+Example: Check stock for 3 products: C855 Mossy Oak (295993), JST81 True Navy L (647554), DT192 Marled Black
+M (678183)
+Previous Process: You would need to submit 3 calls,
+one for each product ID / Part ID combination.
+Call#1
+<shar:productId>C855</shar:productId>
+<shar:Filter>
+<shar:partIdArray>
+<shar:partId>295993</shar:partId>
+</shar:partIdArray>
+</shar:Filter>
+Call#2
+<shar:productId>JST81</shar:productId>
+<shar:Filter>
+<shar:partIdArray>
+<shar:partId>647554</shar:partId>
+</shar:partIdArray>
+</shar:Filter>
+Call#3
+<shar:productId>DT192</shar:productId>
+<shar:Filter>
+<shar:partIdArray>
+<shar:partId>678183</shar:partId>
+</shar:partIdArray>
+</shar:Filter>
+
+Updated Process: You can submit one call for all 3
+PartID’s (Please note a valid Product ID must be
+contained within the call)
+Call#1
+<shar:productId>ST500</shar:productId>
+<shar:Filter>
+<shar:partIdArray>
+<shar:partId>295993</shar:partId>
+<shar:partId>647554</shar:partId>
+<shar:partId>678183</shar:partId>
+</shar:partIdArray>
+</shar:Filter>
+
+70
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards getInventoryLevels V 2.0.0 XML Request Using the partIdArray
+The following example demonstrates an API call to the getInventoryLevels method for Style K420 /
+Brown for small and medium. Small is represented by partId 92032, while medium is represented by
+partId 92033.
+
+PromoStandards Inventory V2.0.0 partIdArray XML Request:
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:ns="http://www.promostandards.org/WSDL/Inventory/2.0.0/"
+xmlns:shar="http://www.promostandards.org/WSDL/Inventory/2.0.0/SharedObjects/">
+<soapenv:Header />
+<soapenv:Body>
+<ns:GetInventoryLevelsRequest>
+<shar:wsVersion>2.0.0</shar:wsVersion>
+<shar:id>SanMarUsername</shar:id>
+<shar:password>SanMarPassword</shar:password>
+<shar:productId>k420</shar:productId>
+<shar:Filter>
+<shar:partIdArray>
+<!--1 or more repetitions:-->
+<shar:partId>92032</shar:partId>
+<shar:partId>92033</shar:partId>
+</shar:partIdArray>
+</shar:Filter>
+</ns:GetInventoryLevelsRequest>
+</soapenv:Body>
+</soapenv:Envelope>
+
+71
+
+SanMar Web Services Integration Guide v24.1
+
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<ns2:GetInventoryLevelsResponse xmlns:ns2="http://www.promostandards.
+org/WSDL/Inventory/2.0.0/"xmlns="http://www.promostandards.
+org/WSDL/Inventory/2.0.0/SharedObjects/">
+<Inventory>
+<productId>k420</productId>
+<PartInventoryArray>
+<PartInventory>
+<partId>92032</partId>
+<mainPart>false</mainPart>
+<partColor>Black</partColor>
+<labelSize>S</labelSize>
+<partDescription>Port Authority Heavyweight Cotton Pique Polo. K420
+</partDescription>
+<quantityAvailable>
+<Quantity>
+<uom>EA</uom>
+<value>1045</value>
+</Quantity>
+</quantityAvailable>
+<manufacturedItem>false</manufacturedItem>
+<buyToOrder>false</buyToOrder>
+<InventoryLocationArray>
+<InventoryLocation>
+<inventoryLocationId>1</inventoryLocationId>
+<inventoryLocationName>Seattle</inventoryLocationName>
+<postalCode>98027</postalCode>
+<country>US</country>
+<inventoryLocationQuantity>
+<Quantity>
+<uom>EA</uom>
+<value>0</value>
+</Quantity>
+</inventoryLocationQuantity>
+</InventoryLocation>
+<InventoryLocation>
+<inventoryLocationId>2</inventoryLocationId>
+<inventoryLocationName>Cincinnati</inventoryLocationName>
+<postalCode>45069</postalCode>
+<country>US</country>
+<inventoryLocationQuantity>
+<Quantity>
+<uom>EA</uom>
+<value>167</value>
+</Quantity>
+</inventoryLocationQuantity>
+</InventoryLocation>
+<InventoryLocation>
+<inventoryLocationId>3</inventoryLocationId>
+<inventoryLocationName>Dallas</inventoryLocationName>
+
+72
+
+SanMar Web Services Integration Guide v24.1
+
+<postalCode>75038</postalCode>
+<country>US</country>
+<inventoryLocationQuantity>
+<Quantity>
+<uom>EA</uom>
+<value>179</value>
+</Quantity>
+</inventoryLocationQuantity>
+</InventoryLocation>
+<InventoryLocation>
+<inventoryLocationId>4</inventoryLocationId>
+<inventoryLocationName>Reno</inventoryLocationName>
+<postalCode>89441</postalCode>
+<country>US</country>
+<inventoryLocationQuantity>
+<Quantity>
+<uom>EA</uom>
+<value>161</value>
+</Quantity>
+</inventoryLocationQuantity>
+</InventoryLocation>
+<InventoryLocation>
+<inventoryLocationId>5</inventoryLocationId>
+<inventoryLocationName>Robbinsville</inventoryLocationName>
+<postalCode>08691</postalCode>
+<country>US</country>
+<inventoryLocationQuantity>
+<Quantity>
+<uom>EA</uom>
+<value>182</value>
+</Quantity>
+</inventoryLocationQuantity>
+</InventoryLocation>
+<InventoryLocation>
+<inventoryLocationId>6</inventoryLocationId>
+<inventoryLocationName>Jacksonville</inventoryLocationName>
+<postalCode>32219</postalCode>
+<country>US</country>
+<inventoryLocationQuantity>
+<Quantity>
+<uom>EA</uom>
+<value>54</value>
+</Quantity>
+</inventoryLocationQuantity>
+</InventoryLocation>
+<InventoryLocation>
+<inventoryLocationId>7</inventoryLocationId>
+<inventoryLocationName>Minneapolis</inventoryLocationName>
+<postalCode>55379</postalCode>
+<country>US</country>
+<inventoryLocationQuantity>
+
+73
+
+SanMar Web Services Integration Guide v24.1
+
+<Quantity>
+<uom>EA</uom>
+<value>143</value>
+</Quantity>
+</inventoryLocationQuantity>
+</InventoryLocation>
+<InventoryLocation>
+<inventoryLocationId>12</inventoryLocationId>
+<inventoryLocationName>Phoenix</inventoryLocationName>
+<postalCode>85323</postalCode>
+<country>US</country>
+<inventoryLocationQuantity>
+<Quantity>
+<uom>EA</uom>
+<value>159</value>
+</Quantity>
+</inventoryLocationQuantity>
+</InventoryLocation>
+</InventoryLocationArray>
+</PartInventory>
+<PartInventory>
+<partId>92033</partId>
+<mainPart>false</mainPart>
+<partColor>Black</partColor>
+<labelSize>M</labelSize>
+<quantityAvailable>
+<Quantity>
+<uom>EA</uom>
+<value>3814</value>
+</Quantity>
+</quantityAvailable>
+<manufacturedItem>false</manufacturedItem>
+<buyToOrder>false</buyToOrder>
+<InventoryLocationArray>
+<InventoryLocation>
+<inventoryLocationId>1</inventoryLocationId>
+<inventoryLocationName>Seattle</inventoryLocationName>
+<postalCode>98027</postalCode>
+<country>US</country>
+<inventoryLocationQuantity>
+<Quantity>
+<uom>EA</uom>
+<value>215</value>
+</Quantity>
+</inventoryLocationQuantity>
+</InventoryLocation>
+<InventoryLocation>
+<inventoryLocationId>2</inventoryLocationId>
+<inventoryLocationName>Cincinnati</inventoryLocationName>
+<postalCode>45069</postalCode>
+<country>US</country>
+
+74
+
+SanMar Web Services Integration Guide v24.1
+
+<inventoryLocationQuantity>
+<Quantity>
+<uom>EA</uom>
+<value>342</value>
+</Quantity>
+</inventoryLocationQuantity>
+</InventoryLocation>
+<InventoryLocation>
+<inventoryLocationId>3</inventoryLocationId>
+<inventoryLocationName>Dallas</inventoryLocationName>
+<postalCode>75038</postalCode>
+<country>US</country>
+<inventoryLocationQuantity>
+<Quantity>
+<uom>EA</uom>
+<value>521</value>
+</Quantity>
+</inventoryLocationQuantity>
+</InventoryLocation>
+<InventoryLocation>
+<inventoryLocationId>4</inventoryLocationId>
+<inventoryLocationName>Reno</inventoryLocationName>
+<postalCode>89441</postalCode>
+<country>US</country>
+<inventoryLocationQuantity>
+<Quantity>
+<uom>EA</uom>
+<value>436</value>
+</Quantity>
+</inventoryLocationQuantity>
+</InventoryLocation>
+<InventoryLocation>
+<inventoryLocationId>5</inventoryLocationId>
+<inventoryLocationName>Robbinsville</inventoryLocationName>
+<postalCode>08691</postalCode>
+<country>US</country>
+<inventoryLocationQuantity>
+<Quantity>
+<uom>EA</uom>
+<value>1246</value>
+</Quantity>
+</inventoryLocationQuantity>
+</InventoryLocation>
+<InventoryLocation>
+<inventoryLocationId>6</inventoryLocationId>
+<inventoryLocationName>Jacksonville</inventoryLocationName>
+<postalCode>32219</postalCode>
+<country>US</country>
+<inventoryLocationQuantity>
+<Quantity>
+<uom>EA</uom>
+
+75
+
+SanMar Web Services Integration Guide v24.1
+
+<value>321</value>
+</Quantity>
+</inventoryLocationQuantity>
+</InventoryLocation>
+<InventoryLocation>
+<inventoryLocationId>7</inventoryLocationId>
+<inventoryLocationName>Minneapolis</inventoryLocationName>
+<postalCode>55379</postalCode>
+<country>US</country>
+<inventoryLocationQuantity>
+<Quantity>
+<uom>EA</uom>
+<value>425</value>
+</Quantity>
+</inventoryLocationQuantity>
+</InventoryLocation>
+<InventoryLocation>
+<inventoryLocationId>12</inventoryLocationId>
+<inventoryLocationName>Phoenix</inventoryLocationName>
+<postalCode>85323</postalCode>
+<country>US</country>
+<inventoryLocationQuantity>
+<Quantity>
+<uom>EA</uom>
+<value>308</value>
+</Quantity>
+</inventoryLocationQuantity>
+</InventoryLocation>
+</InventoryLocationArray>
+</PartInventory>
+</PartInventoryArray>
+</Inventory>
+</ns2:GetInventoryLevelsResponse>
+</S:Body>
+</S:Envelope>
+
+76
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar Pricing Service
+TEST: https://test-ws.sanmar.com:8080/SanMarWebService/SanMarPricingServicePort?wsdl
+PRODUCTION: https://ws.sanmar.com:8080/SanMarWebService/SanMarPricingServicePort?wsdl
+There is one function available for this web service.
+getPricing
+
+77
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar getPricing Service
+This service returns product pricing including piece, dozen, case, sale, and my price (customer specific
+pricing). Request input parameters can include STYLE#/CATALOG COLOR and/or SIZE, or
+INVENTORY_KEY/SIZE_INDEX. Each getPricing submission can contain a single or multiple pricing
+requests.
+
+SanMar getPricing Service Request Parameters with the Style/Color/Size
+
+Field
+
+Description
+
+Example
+
+Required
+
+Type
+
+style
+
+Style number
+
+K500
+
+Yes
+
+STRING
+
+color
+
+Catalog Color
+
+Black
+
+No
+
+STRING
+
+size
+
+Size
+
+XL
+
+No
+
+STRING
+
+SanMar getPricing Service Request Parameters with the Inventory Key and Size Index
+Field
+inventoryKey
+sizeIndex
+
+Description
+SanMar inventory key
+SanMar size index
+
+Required
+Yes
+Yes
+
+Type
+STRING
+STRING
+
+78
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar getPricing Service XML Request
+The following demonstrates an API call to the getPricing method for style LPC61, color Lime, and size
+medium (M). You can submit just the style number to retrieve all the SKU’s for the style.
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:impl="http://impl.webservice.integration.sanmar.com/">
+<soapenv:Header />
+<soapenv:Body>
+<impl:getPricing>
+<arg0>
+<casePrice />
+<color>lime</color>
+<dozenPrice />
+<inventoryKey />
+<myPrice />
+<piecePrice />
+<salePrice />
+<size>m</size>
+<sizeIndex />
+<style>lpc61</style>
+</arg0>
+<arg1>
+<sanMarCustomerNumber>SanMarCustomerNumber</sanMarCustomerNumber>
+<sanMarUserName>SanMarUsername</sanMarUserName>
+<sanMarUserPassword>SanMarPassword</sanMarUserPassword>
+</arg1>
+</impl:getPricing>
+</soapenv:Body>
+</soapenv:Envelope>
+
+79
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar getPricing Service XML Response
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<ns2:getPricingResponse
+xmlns:ns2="http://impl.webservice.integration.sanmar.com/">
+<return>
+<errorOccurred>false</errorOccurred>
+<listResponse xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:type="ns2:item">
+<casePrice>2.59</casePrice>
+<color>lime</color>
+<dozenPrice>3.59</dozenPrice>
+<inventoryKey>46389</inventoryKey>
+<myPrice>1.76</myPrice>
+<piecePrice>3.59</piecePrice>
+<salePrice>1.99</salePrice>
+<size>m</size>
+<sizeIndex>3</sizeIndex>
+<style>lpc61</style>
+<saleStartDate>2017-06-26</saleStartDate>
+<saleEndDate>2017-07-02</saleEndDate>
+<incentivePrice>1.76</incentivePrice>
+</listResponse>
+<message>Pricing returned successfully</message>
+</return>
+</ns2:getPricingResponse>
+</S:Body>
+</S:Envelope>
+
+80
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards - Pricing and Configuration Services
+TEST: https://test-ws.sanmar.com:8080/promostandards/PricingAndConfigurationServiceBinding?WSDL
+PRODUCTION: https://ws.sanmar.com:8080/promostandards/PricingAndConfigurationServiceBinding?WSDL
+There are two functions available for this web service.
+getConfigurationAndPricing
+getFobPoints
+
+81
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards getConfigurationAndPricing Service
+This service returns Net, List or Customer pricing. Net price is the customers cost, List price is the
+suggested pricing (A or R coded) and Customer specific (TVBP/special) pricing.
+
+PromoStandards getConfigurationAndPricing Request Parameters
+Field
+
+Description
+
+Example
+
+Required
+
+Type
+
+Max Chars
+
+wsVersion
+id
+password
+productID
+partId
+currency
+fobId
+priceType
+
+PromoStandard Version
+SanMar.com Username
+SanMar.com Password
+Style Number
+Unique Key
+Enter only: USD
+FOB/Warehouse #
+The requested price type.
+
+Yes
+Yes
+Yes
+Yes
+No
+Yes
+Yes
+Yes
+
+VARCHAR
+Yes
+Yes
+VARCHAR
+VARCHAR
+VARCHAR
+VARCHAR
+VARCHAR
+
+64
+STRING
+STRING
+64
+64
+64
+64
+64
+
+localizationCountry
+localizationLanguage
+configurationType
+
+Enter only: US
+Enter only: EN
+Enter only: Blank
+
+1.0.0
+SanMarUsername
+SanMarPassword
+K500
+240831
+USD
+1-7, 12, 31
+Net(Cost),
+List(MSRP) or
+Customer
+(Special pricing)
+US
+EN
+Blank
+
+Yes
+Yes
+Yes
+
+VARCHAR
+VARCHAR
+VARCHAR
+
+2
+2
+12
+
+PromoStandards getConfigurationAndPricing Service XML Request
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:ns="http://www.promostandards.org/WSDL/PricingAndConfiguration/1.0.0/"
+xmlns:shar="http://www.promostandards.org/WSDL/PricingAndConfiguration/1.0.0/SharedObj
+ects/">
+<soapenv:Header />
+<soapenv:Body>
+<ns:GetConfigurationAndPricingRequest>
+<shar:wsVersion>1.0.0</shar:wsVersion>
+<shar:id>SanMarUsername</shar:id>
+<shar:password>SanMarPassword</shar:password>
+<shar:productId>K500</shar:productId>
+<shar:partId>240831</shar:partId>
+<shar:currency>USD</shar:currency>
+<shar:fobId>6</shar:fobId>
+<shar:priceType>Net</shar:priceType>
+<shar:localizationCountry>US</shar:localizationCountry>
+<shar:localizationLanguage>EN</shar:localizationLanguage>
+<shar:configurationType>Blank</shar:configurationType>
+</ns:GetConfigurationAndPricingRequest>
+</soapenv:Body>
+</soapenv:Envelope>
+
+82
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards getConfigurationAndPricing Service Response Parameters
+Field
+
+Description
+
+Type
+
+partId
+minQuantity
+price
+priceUom
+
+VARCHAR
+INT
+DECIMAL
+VARCHAR
+(2)
+
+ratio
+
+Unique Key
+The minimum quantity for the price break
+The base price of the good without decoration
+Enumerated list of units of measure used to describe the
+price. Values are: {BX, CA, DZ, EA, KT, PR, PK, RL, ST, SL, TH}
+BX – Box|CA – Case | DZ – Dozen | EA – Each | KT – Kit | PR –
+Pair | PK – Package RL – Roll | ST – Set | SL – Sleeve | TH Thousand
+The date the price is effective in ISO8601 format.
+The date the price is no longer effective in ISO8601 format.
+A numeric identifier grouping mutually exclusive parts
+together. When configuring data, always start with part group
+“1”
+A boolean value specifying if this partGroup is required for the
+product configuration. If set to TRUE, a selection in the
+partGroup is required for ordering.
+A description of the partGroup. Examples: “Main Product”,
+“Optional Lid”, “Straw”, etc.
+Describes how the amount of partIds that need to be added to
+the order based on the number of products ordered.
+
+defaultPart
+productID
+
+This part is included in the “Basic Pricing Configuration” service
+price. This field is optional.
+Style Number
+
+currency
+
+The currency supported for the FOB point in ISO4217 format.
+
+fobId
+
+FOB/Warehouse # | example (1-7, 12 or 31)
+
+fobPostalCode
+
+The postal code of the FOB point
+
+priceType
+
+Net or List or Customer
+
+priceEffectiveDate
+priceExpiryDate
+partGroup
+
+partGroupRequired
+partGroupDescription
+
+Max
+Chars
+64
+12, 4
+2
+
+DATE
+DATE
+INT
+
+BOOLEAN
+VARCHAR
+
+64
+12,4
+
+DECIMAL
+(12,4)
+BOOLEAN
+VARCHAR
+(64)
+VARCHAR
+(64)
+VARCHAR
+(64)
+VARCHAR
+(64)
+VARCHAR
+(64)
+
+64
+64
+64
+64
+64
+
+83
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards getConfigurationAndPricing Service Response
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<ns2:GetConfigurationAndPricingResponse xmlns:ns2=
+"http://www.promostandards.org/WSDL/PricingAndConfiguration/1.0.0/"
+xmlns="http://www.promostandards.org/WSDL/PricingAnd
+Configuration/1.0.0/SharedObjects/">
+<ns2:Configuration>
+<ns2:PartArray>
+<ns2:Part>
+<partId>240831</partId>
+<ns2:PartPriceArray>
+<ns2:PartPrice>
+<ns2:minQuantity>1</ns2:minQuantity>
+<ns2:price>8.99</ns2:price>
+<ns2:priceUom>CA</ns2:priceUom>
+<ns2:priceEffectiveDate>2023-05-19T12:51:32.780
+</ns2:priceEffectiveDate>
+<ns2:priceExpiryDate>2023-05-19T23:59:59.000
+</ns2:priceExpiryDate>
+</ns2:PartPrice>
+</ns2:PartPriceArray>
+<partGroup>1</partGroup>
+<partGroupRequired>false</partGroupRequired>
+<partGroupDescription>NA</partGroupDescription>
+<ratio>1</ratio>
+<defaultPart>false</defaultPart>
+</ns2:Part>
+</ns2:PartArray>
+<productId>K500</productId>
+<currency>USD</currency>
+<FobArray>
+<Fob>
+<fobId>6</fobId>
+<fobPostalCode>32219</fobPostalCode>
+</Fob>
+</FobArray>
+<priceType>Net</priceType>
+</ns2:Configuration>
+</ns2:GetConfigurationAndPricingResponse>
+</S:Body>
+</S:Envelope>
+
+84
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards getFobPoints Service
+This service returns basic information about FOB points for a given product.
+
+PromoStandards getFobPoints Request Parameters
+Field
+
+Description
+
+Example
+
+Type
+
+wsVersion
+
+PromoStandard
+Version
+SanMar.com
+Username
+
+1.0.0
+
+VARCHAR
+
+Max
+Chars
+64
+
+SanMarUsername
+
+VARCHAR
+
+64
+
+SanMarPassword
+
+VARCHAR
+
+64
+
+K500
+240831
+USD
+1-7, 12 or 31
+NET(cost), List(MSRP) or
+Customer(special pricing)
+US
+EN
+
+VARCHAR
+VARCHAR
+VARCHAR
+VARCHAR
+VARCHAR
+
+64
+64
+64
+64
+64
+
+VARCHAR
+VARCHAR
+
+2
+2
+
+id
+password
+productID
+partId
+currency
+fobId
+priceType
+localizationCountry
+localizationLanguage
+
+SanMar.com
+Password
+Style Number
+Unique Key
+Enter only: USD
+FOB/Warehouse #
+The requested price
+type.
+Enter only: US
+Enter only: EN
+
+PromoStandards getFobPoints Service XML Request
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:ns="http://www.promostandards.org/WSDL/PricingAndConfiguration/1.0.0/"
+xmlns:shar="http://www.promostandards.org/WSDL/PricingAndConfiguration/1.0.0/SharedObj
+ects/">
+<soapenv:Header />
+<soapenv:Body>
+<ns:GetFobPointsRequest>
+<shar:wsVersion>1.0.0</shar:wsVersion>
+<shar:id>SanMarUsername</shar:id>
+<shar:password>SanMarPassword</shar:password>
+<shar:productId>k500</shar:productId>
+<shar:localizationCountry>us</shar:localizationCountry>
+<shar:localizationLanguage>en</shar:localizationLanguage>
+</ns:GetFobPointsRequest>
+</soapenv:Body>
+</soapenv:Envelope>
+
+85
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards getFobPoints Service Response Parameters
+Field
+fobId
+fobCity
+fobState
+fobPostalCode
+fobCountry
+currency
+partId
+productID
+
+Description
+FOB/Warehouse # | example (1-7, 12 or 31)
+The city of the FOB Point
+The state of the FOB Point in ISO 3166-2 format.
+The Postal or Zip Code of the fob Point
+The country of the FOB Point in Alpha 2 ISO3166 “CODE” format.
+The currency supported for the FOB point in ISO4217 format.
+Unique Key | example (240831)
+Style Number | example (K500)
+
+Type
+VARCHAR
+VARCHAR
+VARCHAR
+VARCHAR
+VARCHAR
+VARCHAR
+VARCHAR
+VARCHAR
+
+Max Chars
+64
+64
+64
+64
+64
+64
+64
+64
+
+86
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards getFobPoints Service XML Response
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<ns2:GetFobPointsResponse xmlns:ns2="http://www.promostandards.org/
+WSDL/PricingAndConfiguration/1.0.0/" xmlns="http://www.promostandards.
+org/WSDL/PricingAndConfiguration/1.0.0/SharedObjects/">
+<ns2:FobPointArray>
+<ns2:FobPoint>
+<fobId>1</fobId>
+<ns2:fobCity>Seattle</ns2:fobCity>
+<ns2:fobState>WA</ns2:fobState>
+<fobPostalCode>98027</fobPostalCode>
+<ns2:fobCountry>US</ns2:fobCountry>
+<ns2:CurrencySupportedArray>
+<ns2:CurrencySupported>
+<currency>USD</currency>
+</ns2:CurrencySupported>
+</ns2:CurrencySupportedArray>
+<ns2:ProductArray>
+<ns2:Product>
+<productId>k500</productId>
+</ns2:Product>
+</ns2:ProductArray>
+</ns2:FobPoint>
+<ns2:FobPoint>
+<fobId>2</fobId>
+<ns2:fobCity>Cincinnati</ns2:fobCity>
+<ns2:fobState>OH</ns2:fobState>
+<fobPostalCode>45069</fobPostalCode>
+<ns2:fobCountry>US</ns2:fobCountry>
+<ns2:CurrencySupportedArray>
+<ns2:CurrencySupported>
+<currency>USD</currency>
+</ns2:CurrencySupported>
+</ns2:CurrencySupportedArray>
+<ns2:ProductArray>
+<ns2:Product>
+<productId>k500</productId>
+</ns2:Product>
+</ns2:ProductArray>
+</ns2:FobPoint>
+</ns2:FobPointArray>
+</ns2:GetFobPointsResponse>
+</S:Body>
+</S:Envelope>
+
+87
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards - Order Shipment Notification Service V1.0.0
+TEST: https://test-ws.sanmar.com:8080/promostandards/OrderShipmentNotificationServiceBinding?wsdl
+PRODUCTION: https://ws.sanmar.com:8080/promostandards/OrderShipmentNotificationServiceBinding?wsdl
+There is one function available for this web service.
+getOrderShipmentNotification
+
+Please Note: Test environment testing for this service requires manual invoicing of your test orders,
+which may take 24-48 hours to complete. Please e-mail the integration team the PO numbers for the
+test orders that you have submitted, and we will have your orders shipped/invoiced in our Test
+system.
+
+88
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards getOrderShipmentNotification Service
+This service returns shipment details for a purchase order based off the query type of the request.
+Shipment details can be searched by purchase order number, invoice number, or shipment date.
+
+PromoStandards getOrderShimentNotification Request Parameters
+Field
+
+Description
+
+Example
+
+Required
+
+Type
+
+wsVersion
+id
+password
+queryType
+
+Promostandard Version
+SanMar.com Username
+SanMar.com Password
+1=Purchase Order#
+2=SanMar Sale Order#
+3= shipmentDateTimeStamp
+Purchase order / Sales Order #
+UTC format (YYYY-MMDD)T(HH:MM:SS)
+
+1.0.0
+SanMarUsername
+SanMarPassword
+1
+
+Yes
+Yes
+Yes
+Yes
+
+STRING
+STRING
+STRING
+STRING
+
+179603
+2017-0213T00:00:00Z
+
+No
+No
+
+STRING
+DATE
+
+referenceNumber
+shipmentDateTimeStamp
+
+Max
+Chars
+64
+64
+64
+
+64
+
+PromoStandards getOrderShipmentNotification Service XML Requests
+queryType 1: Search by Purchase Order Number
+You must remove or comment out the <shipmentDateTimeStamp></shipmentDateTimeStamp> field.
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:ns="http://www.promostandards.org/WSDL/OrderShipmentNotificationService/1.0.0/"x
+mlns:shar="http://www.promostandards.org/WSDL/OrderShipmentNotificationService/1.0.0/S
+haredObjects/">
+<soapenv:Header />
+<soapenv:Body>
+<ns:GetOrderShipmentNotificationRequest>
+<shar:wsVersion>1.0.0</shar:wsVersion>
+<shar:id>SanMarUsername</shar:id>
+<shar:password>SanMarPassword</shar:password>
+<ns:queryType>1</ns:queryType>
+<ns:referenceNumber>PO1645</ns:referenceNumber>
+</ns:GetOrderShipmentNotificationRequest>
+</soapenv:Body>
+</soapenv:Envelope>
+
+89
+
+SanMar Web Services Integration Guide v24.1
+
+queryType 2: Search by SanMar Order Number
+You must remove or comment out the <shipmentDateTimeStamp></shipmentDateTimeStamp> field.
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:ns="http://www.promostandards.org/WSDL/OrderShipmentNotificationService/1.0.0/"x
+mlns:shar="http://www.promostandards.org/WSDL/OrderShipmentNotificationService/1.0.0/S
+haredObjects/">
+<soapenv:Header />
+<soapenv:Body>
+<ns:GetOrderShipmentNotificationRequest>
+<shar:wsVersion>1.0.0</shar:wsVersion>
+<shar:id>SanMarUsername</shar:id>
+<shar:password>SanMarPassword</shar:password>
+<ns:queryType>2</ns:queryType>
+<ns:referenceNumber>71490386</ns:referenceNumber>
+</ns:GetOrderShipmentNotificationRequest>
+</soapenv:Body>
+</soapenv:Envelope>
+
+queryType 3: Search from shipment DateTimeStamp - 7 Day Search Max
+You must remove or comment out the <referenceNumber></referenceNumber> field. ShipDate must
+be in UTC format. The following examples are acceptable formats: 2017-02-13T00:00:00Z, 2017-0213T00:00:00+00:00, 2017-02-17T00:00:00.0000000+00:00
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:ns="http://www.promostandards.org/WSDL/OrderShipmentNotificationService/1.0.0/"x
+mlns:shar="http://www.promostandards.org/WSDL/OrderShipmentNotificationService/1.0.0/S
+haredObjects/">
+<soapenv:Header />
+<soapenv:Body>
+<ns:GetOrderShipmentNotificationRequest>
+<shar:wsVersion>1.0.0</shar:wsVersion>
+<shar:id>SanMarUsername</shar:id>
+<shar:password>SanMarPassword</shar:password>
+<ns:queryType>3</ns:queryType>
+<ns:shipmentDateTimeStamp>2017-02-13T00:00:00Z<ns:shipmentDateTimeStamp>
+</ns:GetOrderShipmentNotificationRequest>
+</soapenv:Body>
+</soapenv:Envelope>
+
+90
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards getOrderShipmentNotification Service XML Response
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<ns2:GetOrderShipmentNotificationResponse xmlns:ns2="http://www.
+promostandards.org/WSDL/OrderShipmentNotificationService/1.0.0/"xmlns="http://www.
+promostandards.org/WSDL/OrderShipmentNotificationService/1.0.0/SharedObjects/">
+<ns2:OrderShipmentNotificationArray>
+<ns2:OrderShipmentNotification>
+<ns2:purchaseOrderNumber>PONUMBER</ns2:purchaseOrderNumber>
+<ns2:complete>true</ns2:complete>
+<ns2:SalesOrderArray>
+<ns2:SalesOrder>
+<ns2:salesOrderNumber>1112223334</ns2:salesOrderNumber>
+<ns2:complete>true</ns2:complete>
+<ns2:ShipmentLocationArray>
+<ns2:ShipmentLocation>
+<ns2:id>1</ns2:id>
+<ns2:complete>true</ns2:complete>
+<ns2:ShipFromAddress>
+<address1>Test Address</address1>
+<city>IRVING</city>
+<region>TX</region>
+<postalCode>75038</postalCode>
+<country>US</country>
+</ns2:ShipFromAddress>
+<ns2:ShipToAddress>
+<address1>Test Address</address1>
+<city>Jacksonville</city>
+<region>FL</region>
+<postalCode>32218</postalCode>
+<country>US</country>
+</ns2:ShipToAddress>
+<ns2:shipmentDestinationType>Commercial
+</ns2:shipmentDestinationType>
+<ns2:PackageArray>
+<ns2:Package>
+<ns2:id>1</ns2:id>
+<ns2:trackingNumber>TrackingNumber</ns2:trackingNumber>
+<ns2:shipmentDate>2023-01-12T22:44:42.46708:00</ns2:shipmentDate>
+<ns2:carrier>UPS</ns2:carrier>
+<ns2:shipmentMethod>Ground</ns2:shipmentMethod>
+<ns2:ItemArray>
+<ns2:Item>
+<ns2:supplierProductId>PC55P</ns2:supplierProductId>
+<ns2:supplierPartId>834732</ns2:supplierPartId>
+<ns2:quantity>1</ns2:quantity>
+</ns2:Item>
+</ns2:ItemArray>
+</ns2:Package>
+</ns2:PackageArray>
+
+91
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards getOrderShipmentNotification Service XML Response
+</ns2:ShipmentLocation>
+</ns2:ShipmentLocationArray>
+</ns2:SalesOrder>
+</ns2:SalesOrderArray>
+</ns2:OrderShipmentNotification>
+</ns2:OrderShipmentNotificationArray>
+</ns2:GetOrderShipmentNotificationResponse>
+</S:Body>
+</S:Envelope>
+
+92
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards Product Order Status Service V2.0.0
+TEST: https://test-ws.sanmar.com:8080/promostandards/OrderStatusServiceBindingV2?wsdl
+PRODUCTION: https://ws.sanmar.com:8080/promostandards/OrderStatusServiceBindingV2?wsdl
+There are three functions available for this web service.
+getIssue (not supported)
+getOrderStatus
+getServiceMethods
+
+Please Note: Test environment testing for this service requires manual invoicing of your test orders,
+which may take 24-48 hours to complete. Please e-mail the integration team the PO numbers for the
+test orders that you have submitted, and we will have your orders shipped/invoiced in our Test
+system.
+
+93
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards getOrderStatus Service
+This service returns the order statuses that SanMar offers based on the query type submitted.
+When utilizing the lastUpdate query, please limit your query to a max of 30 days. If you receive a timeout, please
+reduce your query to a max of 7 days. If you continue to experience a timeout, please utilize the poSearch or
+soSearch queries.
+When calling on backorder, once you have determined an in-hands date with our sales team, please stop calling on
+that order until after the in-hands date has passed.
+
+PromoStandards getOrderStatus Request Parameters
+Field
+
+Description
+
+wsVersion
+id
+password
+querytype
+
+PromoStandard Version
+SanMar.com Username
+SanMar.com Password
+The type of query you wish to
+perform.
+poSearch: Query based on
+the Customer Provided
+Purchase Order Number.
+soSearch: Query based on
+the Sales Order Number
+lastUpdate: Query based on
+all orders with an updated
+time greater than the value
+specified in the
+statusTimeStamp field
+allOpen: Query based on all
+Sales Orders that currently
+have a Status other than
+Complete or Canceled
+allOpenIssues: Query based on
+all open orders that currently
+have an issue associated with
+them with an Issue Status of
+Open or Pending
+Required when any of these
+12345647
+queryTypes are specified:
+poSearch: The purchase
+order number.
+soSearch:the sales order
+number.
+
+reference
+number
+
+Example
+
+Requir
+ed
+2.0.0
+Yes
+SanMarUsername Yes
+SanMarPassword Yes
+poSearch
+Yes
+
+No
+
+Type
+
+Max Chars
+
+VARCHAR
+VARCHAR
+VARCHAR
+STRING
+
+64
+64
+64
+64
+
+String
+
+64
+
+94
+
+SanMar Web Services Integration Guide v24.1
+
+Required with queryType
+status
+TimeStamp lastUpdate.
+Beginning date time since
+last status change in UTC.
+Indicates the change date
+time for any status change
+greater than the value
+provided.
+UTC format (YYYY-MMDD)T(HH:MM:SS)
+Returnissue Returns detailed information
+detailtype regarding order issues
+• noIssues (The response
+does not include issues
+details.)
+• openIssues (the response
+includes issues details for
+issues with an Issue Status of
+Open or Pending.)
+• allIssues (the response
+includes issues details for all
+issues.)
+returnProd Returns detailed information
+regarding the order/ lineuctDetail
+item information.
+
+2021-0213T00:00:00
+
+No
+
+ISO 8601
+
+noIssues
+
+Yes
+
+String
+
+true
+
+Yes
+
+BOOLEAN
+
+PromoStandards getOrderStatus Service XML Request
+queryType 1: Search by Purchase Order Number
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:ns="http://www.promostandards.org/WSDL/OrderStatus/2.0.0/"
+xmlns:shar="http://www.promostandards.org/WSDL/OrderStatus/2.0.0/SharedObjects/">
+<soapenv:Header />
+<soapenv:Body>
+<ns:GetOrderStatusRequest>
+<shar:wsVersion>2.0.0</shar:wsVersion>
+<shar:id>SanMarUsername</shar:id>
+<shar:password>SanMarPassword</shar:password>
+<shar:queryType>poSearch</shar:queryType>
+<shar:referenceNumber>SS3820</shar:referenceNumber>
+<shar:returnIssueDetailType>noIssues</shar:returnIssueDetailType>
+<shar:returnProductDetail>true</shar:returnProductDetail>
+</ns:GetOrderStatusRequest>
+</soapenv:Body>
+</soapenv:Envelope>
+
+95
+
+SanMar Web Services Integration Guide v24.1
+
+queryType 2: Search by Sales Order Number
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:ns="http://www.promostandards.org/WSDL/OrderStatus/2.0.0/"
+xmlns:shar="http://www.promostandards.org/WSDL/OrderStatus/2.0.0/SharedObjects/">
+<soapenv:Header />
+<soapenv:Body>
+<ns:GetOrderStatusRequest>
+<shar:wsVersion>2.0.0</shar:wsVersion>
+<shar:id>SanMarUsername</shar:id>
+<shar:password>SanMarPassword</shar:password>
+<shar:queryType>soSearch</shar:queryType>
+<shar:referenceNumber>100342565</shar:referenceNumber>
+<shar:returnIssueDetailType>noIssues</shar:returnIssueDetailType>
+<shar:returnProductDetail>true</shar:returnProductDetail>
+</ns:GetOrderStatusRequest>
+</soapenv:Body>
+</soapenv:Envelope>
+
+queryType 3: Search from shipment LastUpdate - 30 Day Search Max
+If you receive a timeout, please reduce your query to a max of 7 days.
+If you continue to experience a timeout, please utilize the poSearch or soSearch queries.
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:ns="http://www.promostandards.org/WSDL/OrderStatus/2.0.0/"
+xmlns:shar="http://www.promostandards.org/WSDL/OrderStatus/2.0.0/SharedObjects/">
+<soapenv:Header />
+<soapenv:Body>
+<ns:GetOrderStatusRequest>
+<shar:wsVersion>2.0.0</shar:wsVersion>
+<shar:id>SanMarUsername</shar:id>
+<shar:password>SanMarPassword</shar:password>
+<shar:queryType>lastUpdate</shar:queryType>
+<shar:statusTimeStamp>2023-10-24T00:00:00</shar:statusTimeStamp>
+<shar:returnIssueDetailType>noIssues</shar:returnIssueDetailType>
+<shar:returnProductDetail>true</shar:returnProductDetail>
+</ns:GetOrderStatusRequest>
+</soapenv:Body>
+</soapenv:Envelope>
+
+96
+
+SanMar Web Services Integration Guide v24.1
+
+queryType 4: Search from allOpen
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:ns="http://www.promostandards.org/WSDL/OrderStatus/2.0.0/"
+xmlns:shar="http://www.promostandards.org/WSDL/OrderStatus/2.0.0/SharedObjects/">
+<soapenv:Header />
+<soapenv:Body>
+<ns:GetOrderStatusRequest>
+<shar:wsVersion>2.0.0</shar:wsVersion>
+<shar:id>SanMarUsername</shar:id>
+<shar:password>SanMarPassword</shar:password>
+<shar:queryType>allOpen</shar:queryType>
+<shar:returnIssueDetailType>allIssues</shar:returnIssueDetailType>
+<shar:returnProductDetail>true</shar:returnProductDetail>
+</ns:GetOrderStatusRequest>
+</soapenv:Body>
+</soapenv:Envelope>
+
+queryType 5: Search from allOpenIssues
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:ns="http://www.promostandards.org/WSDL/OrderStatus/2.0.0/"
+xmlns:shar="http://www.promostandards.org/WSDL/OrderStatus/2.0.0/SharedObjects/">
+<soapenv:Header />
+<soapenv:Body>
+<ns:GetOrderStatusRequest>
+<shar:wsVersion>2.0.0</shar:wsVersion>
+<shar:id>SanMarUsername</shar:id>
+<shar:password>SanMarPassword</shar:password>
+<shar:queryType>allOpenIssues</shar:queryType>
+<shar:returnIssueDetailType>allIssues</shar:returnIssueDetailType>
+<shar:returnProductDetail>true</shar:returnProductDetail>
+</ns:GetOrderStatusRequest>
+</soapenv:Body>
+</soapenv:Envelope>
+
+97
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards getOrderStatus Service Response Parameters
+The last returned status will be a ‘Complete’ or ‘Canceled’ return at the order level. Once this status is
+returned you may cease calling on that PO. No further updates will be provided.
+Field
+
+Description
+
+purchaseOrderNumber
+
+The associated purchase order number from the customer
+VARCHAR
+VARCHAR
+The associated factory sales order number (This is used in the
+example of an internal PO splitting at the factory level)
+Received – Order or line item has been received. This status will STRING
+show for items on Backorder or OnHold.
+Confirmed – Order or line item has been received, entered, and
+accepted.
+Partially Shipped – Order or line item has shipped in Part;
+remaining items in production.
+Shipped – Order or line item has shipped in full.
+Complete – Order or line item has shipped in full and invoiced,
+No further updates will be given.
+Canceled – Order or line item has been canceled, no further
+updates will be given.
+
+salesOrderNumber
+
+status
+
+issueCategory
+
+Will show at the header level if one of the following
+IssueCategories apply, otherwise this field will not populate in the
+return:
+
+Type
+
+STRING
+
+Max
+Chars
+64
+64
+
+64
+
+64
+
+generalHold = Order is onHold with SanMar.
+backOrderHold = item is on Backorder with SanMar.
+ContactType
+Default Value - Sales
+VARCHAR 256
+ContactDetailsObject
+Will show Account Executive if applicable
+OBJECT
+Product Array
+An array of Product objects. This field will not be populated if
+ARRAY
+returnProductDetail is false in the XML request.
+Productid
+The Style Number for the associated line item
+STRING
+64
+partid
+The Unique Key for the associated line Item
+STRING
+64
+salesOrderLIneNumber Line item number
+STRING
+64
+QuantityOrdered
+Value and UOM of Quantity ordered
+OBJECT
+QuantityShipped
+Value and UOM of Quantity Shipped
+OBJECT
+status
+Status of the line, see the status facet above for acceptable values VARCHAR 256
+Issue Array
+An array of Issue Objects. This field will not be populated if
+ARRAY
+Return Issue Details = ‘noIssues’ in the XML request, or if there
+are no applicable issues.
+issueStatus
+Items with an assigned issue category will show as ‘open’
+String
+64
+issueCategory
+Will show one of the following categories if applicable:
+String
+64
+generalHold = Order is onHold with SanMar.
+backOrderHold = item is on Backorder with SanMar.
+urgentresponserequired Response will always be ‘false’
+BOOLEAN
+productID
+The Style Number for the associated line item
+STRING
+64
+partID
+The Unique Key for the associated line Item
+STRING
+64
+validTimestamp
+Order status time
+ISO 8601
+code
+INT
+Response code (-0 for successful)
+256
+description
+Response message for requestor
+STRING
+64
+Severity
+Severity of message
+STRING
+
+98
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards getOrderStatusDetails Service XML Response (Return Product Detail = ‘True’)
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<ns2:GetOrderStatusResponse xmlns:ns2=
+"http://www.promostandards.org/WSDL/OrderStatus/2.0.0/" xmlns=
+"http://www.promostandards.org/WSDL/OrderStatus/2.0.0/SharedObjects/">
+<OrderStatusArray>
+<OrderStatus>
+<purchaseOrderNumber>SS3820</purchaseOrderNumber>
+<OrderStatusDetailArray>
+<OrderStatusDetail>
+<salesOrderNumber>100267568</salesOrderNumber>
+<status>received</status>
+<issueCategory>generalHold</issueCategory>
+<OrderContactArray>
+<Contact>
+<contactType>Sales</contactType>
+<ContactDetails />
+</Contact>
+</OrderContactArray>
+<ProductArray>
+<Product>
+<productId>PC54</productId>
+<partId>538612</partId>
+<salesOrderLineNumber>1</salesOrderLineNumber>
+<QuantityOrdered>
+<value>500</value>
+<uom>EA</uom>
+</QuantityOrdered>
+<QuantityShipped>
+<value>0</value>
+<uom>EA</uom>
+</QuantityShipped>
+<status>received</status>
+</Product>
+</ProductArray>
+<IssueArray>
+<Issue>
+<issueStatus>Open</issueStatus>
+<issueCategory>generalHold</issueCategory>
+<urgentResponseRequired>false
+</urgentResponseRequired>
+<productId>PC54</productId>
+<partId>538612</partId>
+</Issue>
+</IssueArray>
+<validTimestamp>2023-12-07T16:11:10.49708:00</validTimestamp>
+</OrderStatusDetail>
+</OrderStatusDetailArray>
+
+99
+
+SanMar Web Services Integration Guide v24.1
+
+</OrderStatus>
+</OrderStatusArray>
+</ns2:GetOrderStatusResponse>
+</S:Body>
+</S:Envelope>
+
+PromoStandards getOrderStatusDetails Service XML Response (Return Product Detail = ‘False’)
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<ns2:GetOrderStatusResponse xmlns:ns2="http://www.promostandards.org/
+WSDL/OrderStatus/2.0.0/" xmlns="http://www.promostandards.org/WSDL/
+OrderStatus/2.0.0/SharedObjects/">
+<OrderStatusArray>
+<OrderStatus>
+<purchaseOrderNumber>SS3820</purchaseOrderNumber>
+<OrderStatusDetailArray>
+<OrderStatusDetail>
+<salesOrderNumber>100267544</salesOrderNumber>
+<status>received</status>
+<issueCategory>generalHold</issueCategory>
+<OrderContactArray>
+<Contact>
+<contactType>Sales</contactType>
+<ContactDetails />
+</Contact>
+</OrderContactArray>
+<IssueArray>
+<Issue>
+<issueStatus>Open</issueStatus>
+<issueCategory>generalHold</issueCategory>
+<urgentResponseRequired>false
+</urgentResponseRequired>
+<productId>PC54</productId>
+<partId>538612</partId>
+</Issue>
+</IssueArray>
+<validTimestamp>2023-12-08T09:47:53.72008:00</validTimestamp>
+</OrderStatusDetail>
+</OrderStatusDetailArray>
+</OrderStatus>
+</OrderStatusArray>
+</ns2:GetOrderStatusResponse>
+</S:Body>
+</S:Envelope>
+
+100
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards getServiceMethods Service
+This service returns the Service Methods that SanMar offers for this call.
+
+PromoStandards getServiceMethods Request Parameters
+Field
+
+Description
+
+Example
+
+wsVersion
+id
+password
+
+PromoStandard Version
+SanMar.com Username
+SanMar.com Password
+
+Requir
+ed
+2.0.0
+Yes
+SanMarUsername Yes
+SanMarPassword Yes
+
+Type
+
+Max Chars
+
+VARCHAR 64
+VARCHAR 64
+VARCHAR 64
+
+PromoStandards getServiceMethods XML Request
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:ns="http://www.promostandards.org/WSDL/OrderStatus/2.0.0/"
+xmlns:shar="http://www.promostandards.org/WSDL/OrderStatus/2.0.0/SharedObjects/">
+<soapenv:Header />
+<soapenv:Body>
+<ns:GetServiceMethodsRequest>
+<shar:wsVersion>2.0.0</shar:wsVersion>
+<shar:id>SanMarUsername</shar:id>
+<shar:password>SanMarPassword</shar:password>
+</ns:GetServiceMethodsRequest>
+</soapenv:Body>
+</soapenv:Envelope>
+
+PromoStandards getServiceMethods Service Response Parameters
+Field
+
+Description
+
+Type
+
+ServiceMethod
+code
+
+Displays the supported Service Method
+Response code (-0 for successful)
+
+VARCHAR
+INT
+
+description
+Severity
+
+Response message for requestor
+Severity of message
+
+STRING
+STRING
+
+Max
+Chars
+64
+
+256
+64
+
+101
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards getOrderStatusDetails Service XML Response
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<ns2:GetServiceMethodsResponse xmlns:ns2="http://www.promostandards.org/
+WSDL/OrderStatus/2.0.0/"xmlns="http://www.promostandards.org/
+WSDL/OrderStatus/2.0.0/SharedObjects/">
+<ServiceMethodArray>
+<serviceMethod>GetOrderStatus</serviceMethod>
+</ServiceMethodArray>
+<ServiceMessageArray>
+<ServiceMessage>
+<code>0</code>
+<description>Information returned successfully.</description>
+<severity>Information</severity>
+</ServiceMessage>
+</ServiceMessageArray>
+</ns2:GetServiceMethodsResponse>
+</S:Body>
+</S:Envelope>
+
+102
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar Standard Invoicing Services
+TEST: https://test-ws.sanmar.com:8080/SanMarWebService/InvoicePort?wsdl
+PRODUCTION: https://ws.sanmar.com:8080/SanMarWebService/InvoicePort?wsdl
+There are ten functions available for this web service.
+GetInvoiceByInvoiceNo
+GetInvoices
+GetInvoicesByInvoiceDateRange
+GetInvoicesByOrderDate
+GetInvoicesByPurchaseOrderNo
+GetInvoicesHeaderByInvoiceDateRange
+GetInvoicesHeaderByOrderDate
+GetInvoicesHeaderByPurchaseOrderNo
+GetUnpaidInvoices
+GetUnpaidInvoicesHeader
+
+Error Messages by Method
+GetInvoiceByPurchaseOrderNo
+Scenario
+If a user does not mention a PO number
+If a user mentions an invalid PO number
+If the PO length is greater than 13
+
+Error Message
+Invalid request
+Data not found
+Data not found
+
+GetInvoicesByInvoiceNo
+Scenario
+If a user does not mention the
+invoice number
+If a user mentions an invalid invoice
+number
+If the invoice number length is
+greater than 10
+
+Error Message
+' is not a valid value for 'integer'
+Data not found
+Value 'xxxxxxxxxx' is not facet-valid with respect to maxInclusive
+'xxxxxxxxxx' for type 'int'.
+
+GetInvoicesByOrderDate
+Scenario
+If the date is not mentioned
+If an invalid date is mentioned
+If the date length is greater than 10
+If the date is before 10-02-1900 or after 10-02-2114
+
+Error Message
+is not a valid value for 'date'
+is not a valid value for 'date'
+'xxxxx-xx-xx' is not a valid value for 'date'
+Data not found
+
+103
+
+SanMar Web Services Integration Guide v24.1
+
+Error Messages Continued
+GetInvoicesByInvoiceDateRange
+Scenario
+If the starting and ending dates are not mentioned
+If the starting or ending dates (or combination of both)
+are invalid
+If the date range is greater than 3 months or 1-year
+
+Error Message
+is not a valid value for 'date'
+is not a valid value for 'date'
+Invalid request
+
+GetUnpaidInvoices
+Scenario
+If there are no unpaid invoices
+
+Error Message
+Data not found
+
+Get Invoices (Incremental)
+Scenario
+If there is no incremental data available
+
+Error Message
+Data not found
+
+104
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar GetInvoicesByInvoiceNo Service
+This method submits an invoice number and returns the header and line-item invoice data for a
+specific invoice number, or an error message if unsuccessful.
+
+SanMar GetInvoicesByInvoiceNo Service Parameters
+Field
+InvoiceNo
+
+Description
+Invoice Number
+
+Required
+Yes
+
+Type
+INT
+
+SanMar GetInvoicesByInvoiceNo Service XML Request
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:web="http://webservice.integration.sanmar.com/">
+<soapenv:Header />
+<soapenv:Body>
+<web:GetInvoiceByInvoiceNo>
+<web:CustomerNo>SanMarCustomerNumber</web:CustomerNo>
+<web:UserName>SanMarUsername</web:UserName>
+<web:Password>SanMarPassword</web:Password>
+<web:InvoiceNo>12345678</web:InvoiceNo>
+</web:GetInvoiceByInvoiceNo>
+</soapenv:Body>
+</soapenv:Envelope>
+
+SanMar GetInvoicesByInvoiceNo Service XML Response
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<Invoice xmlns="http://webservice.integration.sanmar.com/">
+<Header>
+<InvoiceNo>123456789</InvoiceNo>
+<SalesOrderNumber>123456789</SalesOrderNumber>
+<InvoiceDate>2021-02-18</InvoiceDate>
+<InvoiceStatus>Unpaid</InvoiceStatus>
+<CustomerNo>5</CustomerNo>
+<SoldTo>
+<Name>SANMAR EXAMPLE</Name>
+<Address>
+<Address1>123 TEST ROAD</Address1>
+<Address2 />
+<City>ISSAQUAH</City>
+<State>WA</State>
+<PostalCode>98027</PostalCode>
+<Country>US</Country>
+</Address>
+</SoldTo>
+
+105
+
+SanMar Web Services Integration Guide v24.1
+
+<ShipTo>
+<Name>SANMAR EXAMPLE</Name>
+<Address>
+<Address1>123 TEST ROAD</Address1>
+<City>Issaquah</City>
+<State>WA</State>
+<PostalCode>98027-8700</PostalCode>
+<Country>US</Country>
+</Address>
+</ShipTo>
+<RemitTo>
+<Name>SANMAR CORP</Name>
+<Address>
+<Address1>123 TEST ROAD</Address1>
+<City>ISSAQUAH</City>
+<State>WA</State>
+<PostalCode>98027</PostalCode>
+<Country>US</Country>
+</Address>
+</RemitTo>
+<OrderDate>2021-02-17</OrderDate>
+<DueDate>2021-03-20</DueDate>
+<ShipVia>NotUsed</ShipVia>
+<FOB>NotUsed</FOB>
+<Terms>Net30</Terms>
+<SubTotal>8.6</SubTotal>
+<SalesTax>0.0</SalesTax>
+<ShippingHandlingCharges>17.74</ShippingHandlingCharges>
+<TotalAmount>26.34</TotalAmount>
+<Miscellaneous>
+<FreightSavings>0.0</FreightSavings>
+<TrackingIDs>NotUsed</TrackingIDs>
+</Miscellaneous>
+</Header>
+<LineItem>
+<StyleNo>PC55P</StyleNo>
+<StyleColor>Safety Green</StyleColor>
+<StyleDescription>PC Core Blend Pocket Tee</StyleDescription>
+<StyleSize>S</StyleSize>
+<Quantity>2</Quantity>
+<UnitPrice>6.3</UnitPrice>
+<Amount>12.6</Amount>
+<UniqueKey>709802</UniqueKey>
+</LineItem>
+</Invoice>
+</S:Body>
+</S:Envelope>
+
+106
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar GetInvoicesByPurchaseOrderNo Service
+This method submits a purchase order number and returns the header and line-item level data
+for the related purchase order.
+
+SanMar GetInvoicesByPurchaseOrderNo Service Parameters
+Field
+PurchaseOrderNo
+
+Description
+Customer Purchase Order Number
+
+Required
+Yes
+
+Type
+STRING
+
+SanMar GetInvoicesByPurchaseOrderNo Service Service XML Request
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:web="http://webservice.integration.sanmar.com/">
+<soapenv:Header />
+<soapenv:Body>
+<web:GetInvoiceByInvoiceNo>
+<web:CustomerNo>SanMarCustomerNumber</web:CustomerNo>
+<web:UserName>SanMarUsername</web:UserName>
+<web:Password>SanMarPassword</web:Password>
+<web:InvoiceNo>12345678</web:InvoiceNo>
+</web:GetInvoiceByInvoiceNo>
+</soapenv:Body>
+</soapenv:Envelope>
+
+SanMar GetInvoicesByPurchaseOrderNo Service Service XML Response
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<Invoices xmlns="http://webservice.integration.sanmar.com/">
+<Invoice>
+<Header>
+<InvoiceNo>12345678</InvoiceNo>
+<SalesOrderNumber>123456789</SalesOrderNumber>
+<InvoiceDate>2014-08-01</InvoiceDate>
+<InvoiceStatus>Unpaid</InvoiceStatus>
+<CustomerNo>5</CustomerNo>
+<SoldTo>
+<Name>SANMAR</Name>
+<Address>
+<Address1>22833 SE Black Nugget Rd</Address1>
+<City>ISSAQUAH</City>
+<State>WA</State>
+<PostalCode>98029</PostalCode>
+<Country>US</Country>
+</Address>
+</SoldTo>
+<ShipTo>
+
+107
+
+SanMar Web Services Integration Guide v24.1
+
+<Name>SanMar Corporation Inc</Name>
+<Address>
+<Address1>22833 SE Black Nugget Rd</Address1>
+<City>ISSAQUAH</City>
+<State>WA</State>
+<PostalCode>98029</PostalCode>
+<Country>USA</Country>
+</Address>
+</ShipTo>
+<RemitTo>
+<Name>SANMAR CORP</Name>
+<Address>
+<Address1>PO BOX 34060</Address1>
+<City>SEATTLE</City>
+<State>WA</State>
+<PostalCode>98124-1060</PostalCode>
+<Country>USA</Country>
+</Address>
+</RemitTo>
+<PurchaseOrderNo>4520838A</PurchaseOrderNo>
+<OrderDate>2014-08-01</OrderDate>
+<DueDate>2014-08-31</DueDate>
+<ShipVia>UPS</ShipVia>
+<FOB>SPARKS NV</FOB>
+<Terms>NET 30</Terms>
+<TotalCases>1</TotalCases>
+<TotalWeight>36</TotalWeight>
+<SubTotal>192.72</SubTotal>
+<SalesTax>0.0</SalesTax>
+<ShippingHandlingCharges>0.0</ShippingHandlingCharges>
+<TotalAmount>192.72</TotalAmount>
+<Miscellaneous>
+<FreightSavings>0.0</FreightSavings>
+<TrackingIDs>NotUsed</TrackingIDs>
+</Miscellaneous>
+</Header>
+<LineItem>
+<StyleNo>2000</StyleNo>
+<StyleColor>Red</StyleColor>
+<StyleDescription>100% ULTRA CTN T RED</StyleDescription>
+<StyleSize>M</StyleSize>
+<Quantity>16</Quantity>
+<UnitPrice>1.84</UnitPrice>
+<Amount>29.44</Amount>
+<UniqueKey>263633</UniqueKey>
+</LineItem>
+<LineItem>
+<StyleNo>2000</StyleNo>
+<StyleColor>Red</StyleColor>
+<StyleDescription>100% ULTRA CTN T RED</StyleDescription>
+<StyleSize>L</StyleSize>
+<Quantity>14</Quantity>
+<UnitPrice>1.84</UnitPrice>
+<Amount>25.76</Amount>
+<UniqueKey>263634</UniqueKey>
+</LineItem>
+
+108
+
+SanMar Web Services Integration Guide v24.1
+
+<LineItem>
+<StyleNo>2000</StyleNo>
+<StyleColor>Red</StyleColor>
+<StyleDescription>100% ULTRA CTN T RED</StyleDescription>
+<StyleSize>3XL</StyleSize>
+<Quantity>8</Quantity>
+<UnitPrice>4.48</UnitPrice>
+<Amount>35.84</Amount>
+<UniqueKey>263652</UniqueKey>
+</LineItem>
+</Invoice>
+</Invoices>
+</S:Body>
+</S:Envelope>
+
+109
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar GetInvoicesByInvoiceDateRange Service
+This method submits an invoice date range and returns header and line-item data for the date range
+submitted. The starting and ending date range can be no more than 3-months.
+
+SanMar GetInvoicesByInvoiceDateRange Service Parameters
+Field
+StartDate
+EndDate
+
+Description
+yyyy-mm-dd
+yyyy-mm-dd
+
+Required
+Yes
+Yes
+
+Type
+STRING
+STRING
+
+SanMar GetInvoicesByInvoiceDateRange Service XML Request
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:web="http://webservice.integration.sanmar.com/">
+<soapenv:Header />
+<soapenv:Body>
+<web:GetInvoicesByInvoiceDateRange>
+<web:CustomerNo>SanMarCustomerNumber</web:CustomerNo>
+<web:UserName>SanMarUsername</web:UserName>
+<web:Password>SanMarPassword</web:Password>
+<web:StartDate>2014-08-01</web:StartDate>
+<web:EndDate>2014-08-01</web:EndDate>
+</web:GetInvoicesByInvoiceDateRange>
+</soapenv:Body>
+</soapenv:Envelope>
+
+SanMar GetInvoicesByInvoiceDateRange Service XML Response
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<Invoices xmlns="http://webservice.integration.sanmar.com/">
+<Invoice>
+<Header>
+<InvoiceNo>12345678</InvoiceNo>
+<InvoiceDate>2014-08-01</InvoiceDate>
+<InvoiceStatus>Unpaid</InvoiceStatus>
+<CustomerNo>5</CustomerNo>
+<SoldTo>
+<Name>SANMAR</Name>
+<Address>
+<Address1>22833 SE Black Nugget Rd</Address1>
+<City>ISSAQUAH</City>
+<State>WA</State>
+<PostalCode>98029</PostalCode>
+<Country>USA</Country>
+</Address>
+</SoldTo>
+
+110
+
+SanMar Web Services Integration Guide v24.1
+
+<ShipTo>
+<Name>SanMar Corporation Inc.</Name>
+<Address>
+<Address1>22834 SE Black Nugget Rd</Address1>
+<Address2>STE 001</Address2>
+<City>Issaquah</City>
+<State>WA</State>
+<PostalCode>98029</PostalCode>
+<Country>USA</Country>
+</Address>
+</ShipTo>
+<RemitTo>
+<Name>SANMAR CORP</Name>
+<Address>
+<Address1>PO BOX 34060</Address1>
+<City>SEATTLE</City>
+<State>WA</State>
+<PostalCode>98124-1060</PostalCode>
+<Country>USA</Country>
+</Address>
+</RemitTo>
+<PurchaseOrderNo>4530714A</PurchaseOrderNo>
+<OrderDate>2014-08-01</OrderDate>
+<DueDate>2014-08-31</DueDate>
+<ShipVia>UPS</ShipVia>
+<FOB>SPARKS NV</FOB>
+<Terms>NET 30</Terms>
+<TotalCases>1</TotalCases>
+<TotalWeight>1</TotalWeight>
+<SubTotal>1.4</SubTotal>
+<SalesTax>0.0</SalesTax>
+<ShippingHandlingCharges>0.0</ShippingHandlingCharges>
+<TotalAmount>1.4</TotalAmount>
+<Miscellaneous>
+<FreightSavings>0.0</FreightSavings>
+<TrackingIDs>NotUsed</TrackingIDs>
+</Miscellaneous>
+</Header>
+<LineItem>
+<StyleNo>2000</StyleNo>
+<StyleColor>White</StyleColor>
+<StyleDescription>100% ULTRA CTN T WHITE</StyleDescription>
+<StyleSize>M</StyleSize>
+<Quantity>1</Quantity>
+<UnitPrice>1.4</UnitPrice>
+<Amount>1.4</Amount>
+<UniqueKey>263633</UniqueKey>
+</LineItem>
+</Invoice>
+
+111
+
+SanMar Web Services Integration Guide v24.1
+
+</Invoices>
+</S:Body>
+</S:Envelope>
+
+112
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar GetInvoicesByOrderDate Service
+This method submits an order date and returns invoices with header and line-item information.
+
+SanMar GetInvoicesByOrderDate Service Parameters
+Field
+Date
+
+Description
+yyyy-mm-dd
+
+Required
+Yes
+
+Type
+STRING
+
+SanMar GetInvoicesByOrderDate Service XML Request
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:web="http://webservice.integration.sanmar.com/">
+<soapenv:Header />
+<soapenv:Body>
+<web:GetInvoicesByOrderDate>
+<web:CustomerNo>SanMarCustomerNumber</web:CustomerNo>
+<web:UserName>SanMarUsername</web:UserName>
+<web:Password>SanMarPassword</web:Password>
+<web:Date>2014-08-01</web:Date>
+</web:GetInvoicesByOrderDate>
+</soapenv:Body>
+</soapenv:Envelope>
+
+SanMar GetInvoicesByOrderDate Service XML Response
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<Invoices xmlns="http://webservice.integration.sanmar.com/">
+<Invoice>
+<Header>
+<InvoiceNo>12345678</InvoiceNo>
+<InvoiceDate>2014-08-01</InvoiceDate>
+<InvoiceStatus>Unpaid</InvoiceStatus>
+<CustomerNo>5</CustomerNo>
+<SoldTo>
+<Name>SANMAR</Name>
+<Address>
+<Address1>22833 SE Black Nugget Rd</Address1>
+<City>ISSAQUAH</City>
+<State>WA</State>
+<PostalCode>98029</PostalCode>
+<Country>USA</Country>
+</Address>
+</SoldTo>
+<ShipTo>
+<Name>SanMar Corporation Inc.</Name>
+<Address>
+<Address1>22834 SE Black Nugget Rd</Address1>
+
+113
+
+SanMar Web Services Integration Guide v24.1
+
+<Address2>STE 001</Address2>
+<City>Issaquah</City>
+<State>WA</State>
+<PostalCode>98029</PostalCode>
+<Country>USA</Country>
+</Address>
+</ShipTo>
+<RemitTo>
+<Name>SANMAR CORP</Name>
+<Address>
+<Address1>PO BOX 34060</Address1>
+<City>SEATTLE</City>
+<State>WA</State>
+<PostalCode>98124-1060</PostalCode>
+<Country>USA</Country>
+</Address>
+</RemitTo>
+<PurchaseOrderNo>4527160A</PurchaseOrderNo>
+<OrderDate>2014-08-01</OrderDate>
+<DueDate>2014-08-31</DueDate>
+<ShipVia>UPSN</ShipVia>
+<FOB>IRVING TX</FOB>
+<Terms>NET 30</Terms>
+<TotalCases>1</TotalCases>
+<TotalWeight>15</TotalWeight>
+<SubTotal>13.2</SubTotal>
+<SalesTax>0.0</SalesTax>
+<ShippingHandlingCharges>0.0</ShippingHandlingCharges>
+<TotalAmount>13.2</TotalAmount>
+<Miscellaneous>
+<FreightSavings>0.0</FreightSavings>
+<TrackingIDs>NotUsed</TrackingIDs>
+</Miscellaneous>
+</Header>
+<LineItem>
+<StyleNo>5250</StyleNo>
+<StyleColor>Gold</StyleColor>
+<StyleDescription>TAGLESS 100% CTN TEE GOLD</StyleDescription>
+<StyleSize>S</StyleSize>
+<Quantity>8</Quantity>
+<UnitPrice>1.65</UnitPrice>
+<Amount>13.2</Amount>
+<UniqueKey>405532</UniqueKey>
+</LineItem>
+</Invoice>
+</Invoices>
+</S:Body>
+</S:Envelope>
+
+114
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar GetInvoicesHeaderByInvoiceDateRange Service
+This method submits an invoice header date range and returns header information for the submitted
+date range. The date range can be no more then 1-year from the day submitted.
+
+SanMar GetInvoicesHeaderByInvoiceDateRange Service Parameters
+Field
+StartDate
+EndDate
+
+Description
+yyyy-mm-dd
+yyyy-mm-dd
+
+Required
+Yes
+Yes
+
+Type
+STRING
+STRING
+
+SanMar GetInvoicesHeaderByInvoiceDateRange Service XML Request
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:web="http://webservice.integration.sanmar.com/">
+<soapenv:Header />
+<soapenv:Body>
+<web:GetInvoicesByInvoiceDateRange>
+<web:CustomerNo>SanMarCustomerNumber</web:CustomerNo>
+<web:UserName>SanMarUsername</web:UserName>
+<web:Password>SanMarPassword</web:Password>
+<web:StartDate>2022-01-22</web:StartDate>
+<web:EndDate>2022-02-04</web:EndDate>
+</web:GetInvoicesByInvoiceDateRange>
+</soapenv:Body>
+</soapenv:Envelope>
+
+SanMar GetInvoicesHeaderByInvoiceDateRange Service Response
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<Invoices xmlns="http://webservice.integration.sanmar.com/">
+<Invoice>
+<Header>
+<InvoiceNo>12345678</InvoiceNo>
+<InvoiceDate>2022-01-24</InvoiceDate>
+<InvoiceStatus>Unpaid</InvoiceStatus>
+<CustomerNo>5</CustomerNo>
+<SoldTo>
+<Name>SanMar</Name>
+<Address>
+<Address1>2910 DISTRICT AVE</Address1>
+<City>FAIRFAX</City>
+<State>VA</State>
+<PostalCode>22031</PostalCode>
+<Country>USA</Country>
+</Address>
+</SoldTo>
+<ShipTo>
+<Name>SANMAR</Name>
+<Address>
+
+115
+
+SanMar Web Services Integration Guide v24.1
+
+<Address1>22833 SE Black Nugget Rd</Address1>
+
+<Address2>STE 20</Address2>
+<City>ISSAQUAH</City>
+<State>WA</State>
+<PostalCode>98029</PostalCode>
+<Country>USA</Country>
+</Address>
+</ShipTo>
+<RemitTo>
+<Name>SanMar Corporation Inc.</Name>
+<Address>
+<Address1>22834 SE Black Nugget Rd</Address1>
+<City>Issaquah</City>
+<State>WA</State>
+<PostalCode>98029</PostalCode>
+<Country>USA</Country>
+</Address>
+</RemitTo>
+<PurchaseOrderNo>123456</PurchaseOrderNo>
+<OrderDate>2022-01-23</OrderDate>
+<DueDate>2022-01-24</DueDate>
+<ShipVia>UPS</ShipVia>
+<FOB>SPARKS NV</FOB>
+<Terms>NET 30</Terms>
+<TotalCases>1</TotalCases>
+<TotalWeight>1</TotalWeight>
+<SubTotal>4.58</SubTotal>
+<SalesTax>0.0</SalesTax>
+<ShippingHandlingCharges>0.0</ShippingHandlingCharges>
+<TotalAmount>4.58</TotalAmount>
+<Miscellaneous>
+<FreightSavings>0.0</FreightSavings>
+<TrackingIDs>NotUsed</TrackingIDs>
+</Miscellaneous>
+</Header>
+<LineItem>
+<StyleNo>PC61</StyleNo>
+<StyleColor>White</StyleColor>
+<StyleDescription>PC61 100% T WHITE</StyleDescription>
+<StyleSize>5XL</StyleSize>
+<Quantity>1</Quantity>
+<UnitPrice>4.58</UnitPrice>
+<Amount>4.58</Amount>
+<UniqueKey>203314</UniqueKey>
+</LineItem>
+</Invoice>
+</Invoices>
+</S:Body>
+</S:Envelope>
+
+116
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar GetUnpaidInvoices Service
+This method submits authentication credentials for an account and returns header and line-item
+information for all unpaid invoices.
+
+SanMar GetUnpaidInvoices Service Parameters
+Field
+InvoiceNo
+
+Description
+Invoice Number
+
+Required
+Yes
+
+Type
+INT
+
+SanMar GetUnpaidInvoices Service XML Request
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:web="http://webservice.integration.sanmar.com/">
+<soapenv:Header />
+<soapenv:Body>
+<web:GetUnpaidInvoices>
+<web:CustomerNo>SanMarCustomerNumber</web:CustomerNo>
+<web:UserName>SanMarUsername</web:UserName>
+<web:Password>SanMarPassword</web:Password>
+</web:GetUnpaidInvoices>
+</soapenv:Body>
+</soapenv:Envelope>
+
+SanMar GetUnpaidInvoices Service XML Response
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<Invoices xmlns="http://webservice.integration.sanmar.com/">
+<Invoice>
+<Header>
+<InvoiceNo>12345678</InvoiceNo>
+<InvoiceDate>2014-08-01</InvoiceDate>
+<InvoiceStatus>Unpaid</InvoiceStatus>
+<CustomerNo>5</CustomerNo>
+<SoldTo>
+<Name>SanMar</Name>
+<Address>
+<Address1>2910 DISTRICT AVE</Address1>
+<City>FAIRFAX</City>
+<State>VA</State>
+<PostalCode>22031</PostalCode>
+<Country>USA</Country>
+</Address>
+</SoldTo>
+<ShipTo>
+<Name>SANMAR</Name>
+<Address>
+<Address1>22833 SE Black Nugget Rd</Address1>
+<Address2>STE 20</Address2>
+<City>ISSAQUAH</City>
+
+117
+
+SanMar Web Services Integration Guide v24.1
+
+<State>WA</State>
+<PostalCode>98029</PostalCode>
+<Country>USA</Country>
+</Address>
+</ShipTo>
+<RemitTo>
+<Name>SanMar Corporation Inc.</Name>
+<Address>
+<Address1>22834 SE Black Nugget Rd</Address1>
+<City>Issaquah</City>
+<State>WA</State>
+<PostalCode>98029</PostalCode>
+<Country>USA</Country>
+</Address>
+</RemitTo>
+<PurchaseOrderNo>123456</PurchaseOrderNo>
+<OrderDate>2004-06-11</OrderDate>
+<DueDate>2004-07-11</DueDate>
+<ShipVia>UPS</ShipVia>
+<FOB>SPARKS NV</FOB>
+<Terms>NET 30</Terms>
+<TotalCases>1</TotalCases>
+<TotalWeight>1</TotalWeight>
+<SubTotal>4.58</SubTotal>
+<SalesTax>0.0</SalesTax>
+<ShippingHandlingCharges>0.0</ShippingHandlingCharges>
+<TotalAmount>4.58</TotalAmount>
+<Miscellaneous>
+<FreightSavings>0.0</FreightSavings>
+<TrackingIDs>NotUsed</TrackingIDs>
+</Miscellaneous>
+</Header>
+<LineItem>
+<StyleNo>PC61</StyleNo>
+<StyleColor>White</StyleColor>
+<StyleDescription>PC61 100% T WHITE</StyleDescription>
+<StyleSize>5XL</StyleSize>
+<Quantity>1</Quantity>
+<UnitPrice>4.58</UnitPrice>
+<Amount>4.58</Amount>
+<UniqueKey>203314</UniqueKey>
+</LineItem>
+</Invoice>
+</Invoices>
+</S:Body>
+</S:Envelope>
+
+118
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar GetInvoicesHeaderByOrderDate Service
+This method submits the Invoice Header By order date and returns header information for a specific
+order date.
+
+SanMar GetInvoicesHeaderByOrderDate Service Parameters
+Field
+Date
+
+Description
+yyyy-mm-dd
+
+Required
+Yes
+
+Type
+STRING
+
+SanMar GetInvoicesHeaderByOrderDate Service XML Request
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:web="http://webservice.integration.sanmar.com/">
+<soapenv:Header />
+<soapenv:Body>
+<web:GetInvoicesHeaderByOrderDate>
+<web:CustomerNo>SanMarCustomerNumber</web:CustomerNo>
+<web:UserName>SanMarUsername</web:UserName>
+<web:Password>SanMarPassword</web:Password>
+<web:Date>2014-08-01</web:Date>
+</web:GetInvoicesHeaderByOrderDate>
+</soapenv:Body>
+</soapenv:Envelope>
+
+SanMar GetInvoicesHeaderByOrderDate Service XML Response
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<InvoicesHeader xmlns="http://webservice.integration.sanmar.com/">
+<InvoiceHeader>
+<InvoiceNo>12345678</InvoiceNo>
+<InvoiceDate>2014-08-01</InvoiceDate>
+<InvoiceStatus>Unpaid</InvoiceStatus>
+<CustomerNo>5</CustomerNo>
+<SoldTo>
+<Name>SANMAR</Name>
+<Address>
+<Address1>22833 SE Black Nugget Rd</Address1>
+<City>ISSAQUAH</City>
+<State>WA</State>
+<PostalCode>98029</PostalCode>
+<Country>USA</Country>
+</Address>
+</SoldTo>
+<ShipTo>
+<Name>SanMar Corporation Inc.</Name>
+<Address>
+<Address1>22834 SE Black Nugget Rd</Address1>
+<Address2>ST 001</Address2>
+<City>Issaquah</City>
+<State>WA</State>
+
+119
+
+SanMar Web Services Integration Guide v24.1
+
+<PostalCode>98029</PostalCode>
+<Country>USA</Country>
+</Address>
+</ShipTo>
+<PurchaseOrderNo>4520838A</PurchaseOrderNo>
+<OrderDate>2014-08-01</OrderDate>
+<DueDate>2014-08-31</DueDate>
+<ShipVia />
+<FOB>SPARKS NV</FOB>
+<Terms>NET 30</Terms>
+<TotalCases>1</TotalCases>
+<TotalWeight>15</TotalWeight>
+<SubTotal>51.15</SubTotal>
+<SalesTax>0.0</SalesTax>
+<ShippingHandlingCharges>0.0</ShippingHandlingCharges>
+<TotalAmount>51.15</TotalAmount>
+<Miscellaneous>
+<FreightSavings>0.0</FreightSavings>
+<TrackingIDs>NotUsed</TrackingIDs>
+</Miscellaneous>
+</InvoiceHeader>
+</InvoicesHeader>
+</S:Body>
+</S:Envelope>
+
+120
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar GetInvoicesHeaderByPurchaseOrderNo Service
+This method submits a purchase order number and returns invoice header information. Each PO
+number must be requested individually.
+
+SanMar GetInvoicesHeaderByPurchaseOrderNo Service Parameters
+Field
+PurchaseOrderNo
+
+Description
+Customer PO Number
+
+Required
+Yes
+
+Type
+STRING
+
+SanMar GetInvoicesHeaderByPurchaseOrderNo Service XML Request
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:web="http://webservice.integration.sanmar.com/">
+<soapenv:Header />
+<soapenv:Body>
+<web:GetInvoicesHeaderByPurchaseOrderNo>
+<web:CustomerNo>SanMarCustomerNumber</web:CustomerNo>
+<web:UserName>SanMarUsername</web:UserName>
+<web:Password>SanMarPassword</web:Password>
+<web:PurchaseOrderNo>4520838a</web:PurchaseOrderNo>
+</web:GetInvoicesHeaderByPurchaseOrderNo>
+</soapenv:Body>
+</soapenv:Envelope>
+
+SanMar GetInvoicesHeaderByPurchaseOrderNo Service XML Response
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<InvoicesHeader xmlns="http://webservice.integration.sanmar.com/">
+<InvoiceHeader>
+<InvoiceNo>12345678</InvoiceNo>
+<InvoiceDate>2014-08-01</InvoiceDate>
+<InvoiceStatus>Unpaid</InvoiceStatus>
+<CustomerNo>5</CustomerNo>
+<SoldTo>
+<Name>SANMAR</Name>
+<Address>
+<Address1>22833 SE Black Nugget Rd</Address1>
+<City>Issaquah</City>
+<State>WA</State>
+<PostalCode>98029</PostalCode>
+<Country>USA</Country>
+</Address>
+</SoldTo>
+<ShipTo>
+
+121
+
+SanMar Web Services Integration Guide v24.1
+
+<Name>SanMar Corporation Inc.</Name>
+<Address>
+<Address1>22834 SE Black Nugget Rd</Address1>
+<Address2>ST 001</Address2>
+<City>Issaquah</City>
+<State>WA</State>
+<PostalCode>98029</PostalCode>
+<Country>USA</Country>
+</Address>
+</ShipTo>
+<PurchaseOrderNo>4520838A</PurchaseOrderNo>
+<OrderDate>2014-08-01</OrderDate>
+<DueDate>2014-08-31</DueDate>
+<ShipVia />
+<FOB>SPARKS NV</FOB>
+<Terms>NET 30</Terms>
+<TotalCases>1</TotalCases>
+<TotalWeight>36</TotalWeight>
+<SubTotal>192.72</SubTotal>
+<SalesTax>0.0</SalesTax>
+<ShippingHandlingCharges>0.0</ShippingHandlingCharges>
+<TotalAmount>192.72</TotalAmount>
+<Miscellaneous>
+<FreightSavings>0.0</FreightSavings>
+<TrackingIDs>NotUsed</TrackingIDs>
+</Miscellaneous>
+</InvoiceHeader>
+</InvoicesHeader>
+</S:Body>
+</S:Envelope>
+
+122
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar GetUnpaidInvoicesHeader Service
+This method submits authentication credentials for an account and returns header information for all
+unpaid invoices.
+
+SanMar GetUnpaidInvoicesHeader Service Parameters
+Field
+custNo
+userName
+password
+
+Description
+SanMar Customer Number
+SanMar Web Username
+SanMar Web User Password
+
+Required
+Yes
+Yes
+Yes
+
+Type
+INT
+STRING
+STRING
+
+SanMar GetUnpaidInvoicesHeader Service XML Request
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:web="http://webservice.integration.sanmar.com/">
+<soapenv:Header />
+<soapenv:Body>
+<web:GetUnpaidInvoicesHeader>
+<web:CustomerNo>SanMarCustomerNumber</web:CustomerNo>
+<web:UserName>SanMarUsername</web:UserName>
+<web:Password>SanMarPassword</web:Password>
+</web:GetUnpaidInvoicesHeader>
+</soapenv:Body>
+</soapenv:Envelope>
+
+SanMar GetUnpaidInvoicesHeader Service XML Response
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<InvoicesHeader xmlns="http://webservice.integration.sanmar.com/">
+<InvoiceHeader>
+<InvoiceNo>12345678</InvoiceNo>
+<InvoiceDate>2004-06-11</InvoiceDate>
+<InvoiceStatus>Unpaid</InvoiceStatus>
+<CustomerNo>5</CustomerNo>
+<SoldTo>
+<Name>SANMAR</Name>
+<Address>
+<Address1>22833 SE Black Nugget Rd</Address1>
+<City>ISSAQUAH</City>
+<State>WA</State>
+<PostalCode>98029</PostalCode>
+<Country>USA</Country>
+</Address>
+</SoldTo>
+<ShipTo>
+<Name>SanMar Corporation Inc.</Name>
+<Address>
+
+123
+
+SanMar Web Services Integration Guide v24.1
+
+<Address1>22834 SE Black Nugget Rd</Address1>
+<Address2>STE 001</Address2>
+<City>Issaquah</City>
+<State>WA</State>
+<PostalCode>98029</PostalCode>
+<Country>USA</Country>
+</Address>
+</ShipTo>
+<PurchaseOrderNo>118489</PurchaseOrderNo>
+<OrderDate>2004-06-11</OrderDate>
+<DueDate>2004-07-11</DueDate>
+<ShipVia>UPS</ShipVia>
+<FOB>SPARKS NV</FOB>
+<Terms>NET 30</Terms>
+<TotalCases>1</TotalCases>
+<TotalWeight>1</TotalWeight>
+<SubTotal>4.58</SubTotal>
+<SalesTax>0.0</SalesTax>
+<ShippingHandlingCharges>0.0</ShippingHandlingCharges>
+<TotalAmount>4.58</TotalAmount>
+<Miscellaneous>
+<FreightSavings>0.0</FreightSavings>
+<TrackingIDs>NotUsed</TrackingIDs>
+</Miscellaneous>
+</InvoiceHeader>
+</InvoicesHeader>
+</S:Body>
+</S:Envelope>
+
+124
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar GetInvoices Service
+This method retrieves all invoice headers and line-item data for the last three months the first time the
+service is called. The next time the call is made, the invoice data returned will be the difference between
+the previous call and the new call. SanMar recommends this method for customers who are processing
+invoices frequently.
+
+SanMar GetInvoices Service Parameters
+Field
+custNo
+userName
+password
+
+Description
+SanMar Customer Number
+SanMar Web Username
+SanMar Web User Password
+
+Required
+Yes
+Yes
+Yes
+
+Type
+INT
+STRING
+STRING
+
+SanMar GetInvoices Service XML Request
+<<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:web="http://webservice.integration.sanmar.com/">
+<soapenv:Header />
+<soapenv:Body>
+<web:GetInvoices>
+<web:CustomerNo>SanMarCustomerNumber</web:CustomerNo>
+<web:UserName>SanMarUsername</web:UserName>
+<web:Password>SanMarPassword</web:Password>
+</web:GetInvoices>
+</soapenv:Body>
+</soapenv:Envelope>
+
+SanMar GetInvoices Service XML Response
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<Invoices xmlns="http://webservice.integration.sanmar.com/">
+<Invoice>
+<Header>
+<InvoiceNo>12345678</InvoiceNo>
+<InvoiceDate>2014-09-05</InvoiceDate>
+<InvoiceStatus>Unpaid</InvoiceStatus>
+<CustomerNo>5</CustomerNo>
+<SoldTo>
+<Name>SANMAR</Name>
+<Address>
+<Address1>22833 SE Black Nugget Rd</Address1>
+<City>ISSAQUAH</City>
+<State>WA</State>
+<PostalCode>98029</PostalCode>
+<Country>USA</Country>
+</Address>
+</SoldTo>
+<ShipTo>
+
+125
+
+SanMar Web Services Integration Guide v24.1
+
+<Name>SanMar Corporation Inc.</Name>
+<Address>
+<Address1>22834 SE Black Nugget Rd</Address1>
+<City>Issaquah</City>
+<State>WA</State>
+<PostalCode>98029</PostalCode>
+<Country>USA</Country>
+</Address>
+</ShipTo>
+<RemitTo>
+<Name>SANMAR CORP</Name>
+<Address>
+<Address1>PO BOX 643693</Address1>
+<City>CINCINNATI</City>
+<State>OH</State>
+<PostalCode>45264-3693</PostalCode>
+<Country>USA</Country>
+</Address>
+</RemitTo>
+<PurchaseOrderNo>4663454A</PurchaseOrderNo>
+<OrderDate>2014-09-04</OrderDate>
+<DueDate>2014-10-05</DueDate>
+<ShipVia>UPSB</ShipVia>
+<FOB>ROBBINSVILLE NJ</FOB>
+<Terms>NET 30</Terms>
+<TotalCases>1</TotalCases>
+<TotalWeight>3</TotalWeight>
+<SubTotal>1.98</SubTotal>
+<SalesTax>0.0</SalesTax>
+<ShippingHandlingCharges>0.0</ShippingHandlingCharges>
+<TotalAmount>1.98</TotalAmount>
+<Miscellaneous>
+<FreightSavings>0.0</FreightSavings>
+<TrackingIDs>NotUsed</TrackingIDs>
+</Miscellaneous>
+</Header>
+<LineItem>
+<StyleNo>2000</StyleNo>
+<StyleColor>Cardinal Red</StyleColor>
+<StyleDescription>100% ULTRA CTN T CARDINAL RED</StyleDescription>
+<StyleSize>M</StyleSize>
+<Quantity>1</Quantity>
+<UnitPrice>1.98</UnitPrice>
+<Amount>1.98</Amount>
+<uniqueKey>262863</uniqueKey>
+</LineItem>
+</Invoice>
+</Invoices>
+</S:Body>
+</S:Envelope>
+
+126
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards Invoice Services V1.0.0
+TEST: https://test-ws.sanmar.com:8080/promostandards/InvoiceServiceBindingV1_0_0?WSDL
+PRODUCTION: https://ws.sanmar.com:8080/promostandards/InvoiceServiceBindingV1_0_0?WSDL
+There is one function available for this web service. Please Note: SanMar does not currently support
+getVoidedInvoices.
+getInvoices
+
+127
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards getInvoices v1.0.0 Service
+This service returns SanMar invoices based on the purchase order number, invoice number, invoice
+date, or requested date. There are four query types for this service.
+
+PromoStandards getInvoices v1.0.0 Request Parameters
+Field
+
+queryType
+
+referenceNumber
+
+requestedDate
+availableTimeStamp
+
+Description
+
+Example
+
+Required
+
+Type
+
+The requested query type for the
+submission. Query types are
+numbered 1 through 4.
+1 = PO number
+2 = Invoice number
+3 = date of the invoice
+4 = date/time
+The purchase order or invoice
+number when using query type
+1 or 2.
+Date requested for query type
+3. Must be in YYYY-MM-DD
+format.
+UTC format (YYYY-MMDD)T(HH:MM:SS)
+
+1
+
+Yes
+
+VARCHAR
+
+Max
+Chars
+64
+
+VARCHAR
+
+64
+
+110920
+No
+2020-1109
+
+DATE
+No
+
+2017-0213T00:00:00
+
+TIMESTAMP
+No
+
+PromoStandards getInvoices v1.0.0 Service XML Request Queries
+queryType 1: Search Invoices by Purchase Order Number:
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:ns="http://www.promostandards.org/WSDL/Invoice/1.0.0/"
+xmlns:shar="http://www.promostandards.org/WSDL/Invoice/1.0.0/SharedObjects/">
+<soapenv:Header/>
+<soapenv:Body>
+<ns:GetInvoicesRequest>
+<shar:wsVersion>1.0.0</shar:wsVersion>
+<shar:id>SanMarUsername</shar:id>
+<shar:password>SanMarPassword</shar:password>
+<shar:queryType>1</shar:queryType>
+<shar:referenceNumber>110920</shar:referenceNumber>
+</ns:GetInvoicesRequest>
+</soapenv:Body>
+</soapenv:Envelope>
+
+128
+
+SanMar Web Services Integration Guide v24.1
+
+queryType 2: Search Invoices by Invoice Number:
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:ns="http://www.promostandards.org/WSDL/Invoice/1.0.0/"
+xmlns:shar="http://www.promostandards.org/WSDL/Invoice/1.0.0/SharedObjects/">
+<soapenv:Header/>
+<soapenv:Body>
+<ns:GetInvoicesRequest>
+<shar:wsVersion>1.0.0</shar:wsVersion>
+<shar:id>SanMarUsername</shar:id>
+<shar:password>SanMarPassword</shar:password>
+<shar:queryType>2</shar:queryType>
+<shar:referenceNumber>103036257</shar:referenceNumber>
+</ns:GetInvoicesRequest>
+</soapenv:Body>
+</soapenv:Envelope>
+
+queryType 3: Search Invoices by Invoice Date:
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:ns="http://www.promostandards.org/WSDL/Invoice/1.0.0/"
+xmlns:shar="http://www.promostandards.org/WSDL/Invoice/1.0.0/SharedObjects/">
+<soapenv:Header/>
+<soapenv:Body>
+<ns:GetInvoicesRequest>
+<shar:wsVersion>1.0.0</shar:wsVersion>
+<shar:id>SanMarUsername</shar:id>
+<shar:password>SanMarPassword</shar:password>
+<shar:queryType>3</shar:queryType>
+<shar:requestedDate>2020-10-25</shar:requestedDate>
+</ns:GetInvoicesRequest>
+</soapenv:Body>
+</soapenv:Envelope>
+
+129
+
+SanMar Web Services Integration Guide v24.1
+
+queryType 4: Search Invoices by Requested Date. This will retrieve all invoice data invoiced
+after the date queried in the availableTimeStamp field:
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:ns="http://www.promostandards.org/WSDL/Invoice/1.0.0/"
+xmlns:shar="http://www.promostandards.org/WSDL/Invoice/1.0.0/SharedObjects/">
+<soapenv:Header/>
+<soapenv:Body>
+<ns:GetInvoicesRequest>
+<shar:wsVersion>1.0.0</shar:wsVersion>
+<shar:id>SanMarUsername</shar:id>
+<shar:password>SanMarPassword</shar:password>
+<shar:queryType>4</shar:queryType>
+<shar:availableTimeStamp>2020-11-09T00:00:00.00
+</shar:availableTimeStamp>
+</ns:GetInvoicesRequest>
+</soapenv:Body>
+</soapenv:Envelope>
+
+130
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards getInvoices V1.0.0 Service XML Request and Response Using queryType 2
+The following example demonstrates an API request to the PromoStandards getInvoice method using
+queryType 2 for invoice number 123456798.
+
+PromoStandards getInvoices V1.0.0 XML Request:
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:ns="http://www.promostandards.org/WSDL/Invoice/1.0.0/"
+xmlns:shar="http://www.promostandards.org/WSDL/Invoice/1.0.0/SharedObjects/">
+<soapenv:Header />
+<soapenv:Body>
+<ns:GetInvoicesRequest>
+<shar:wsVersion>1.0.0</shar:wsVersion>
+<shar:id>SanMarUsername</shar:id>
+<shar:password>SanMarPassword</shar:password>
+<shar:queryType>2</shar:queryType>
+<shar:referenceNumber>123456798</shar:referenceNumber>
+</ns:GetInvoicesRequest>
+</soapenv:Body>
+</soapenv:Envelope>
+
+PromoStandards getInvoices V1.0.0 XML Response
+< <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<ns2:GetInvoicesResponse
+xmlns="http://www.promostandards.org/WSDL/Invoice/1.0.0/SharedObjects/"
+xmlns:ns2="http://www.promostandards.org/WSDL/Invoice/1.0.0/">
+<ns2:InvoiceArray>
+<ns2:Invoice>
+<invoiceNumber>123456798</invoiceNumber>
+<invoiceType>Invoice</invoiceType>
+<invoiceDate>2021-03-24</invoiceDate>
+<purchaseOrderNumber>112233445</purchaseOrderNumber>
+<ns2:BillTo>
+<AccountInfo>
+<accountName>TestAccount</accountName>
+<accountNumber>12345</accountNumber>
+<Address1>Testaddress</Address1>
+<Address2>STE A</Address2>
+<city>Seattle</city>
+<region>WA</region>
+</AccountInfo>
+</ns2:BillTo>
+<ns2:SoldTo>
+<AccountInfo>
+<accountName>TestAccount</accountName>
+<accountNumber>12345</accountNumber>
+<Address1>Testaddress</Address1>
+<Address2>STE A</Address2>
+<city>Seattle</city>
+<region>WA</region>
+</AccountInfo>
+
+131
+
+SanMar Web Services Integration Guide v24.1
+
+PromoStandards getInvoices V1.0.0 XML Response Continued
+</ns2:SoldTo>
+<paymentDueDate>2021-04-24</paymentDueDate>
+<currency>USD</currency>
+<salesAmount>15.67</salesAmount>
+<shippingAmount>0.0</shippingAmount>
+<handlingAmount>0.0</handlingAmount>
+<taxAmount>0.00</taxAmount>
+<invoiceAmount>15.67</invoiceAmount>
+<advancePaymentAmount>0.00</advancePaymentAmount>
+<invoiceAmountDue>15.67</invoiceAmountDue>
+<ns2:InvoiceLineItemsArray>
+<InvoiceLineItem>
+<productId>ST860</productId>
+<partId>1019704</partId>
+<invoiceQuantity>1</invoiceQuantity>
+<quantityUOM>EA</quantityUOM>
+<lineItemDescription>ST Sport-Wick Textured 1/4-Zip
+Pullover</lineItemDescription>
+<unitPrice>15.67</unitPrice>
+<extendedPrice>15.67</extendedPrice>
+</InvoiceLineItem>
+</ns2:InvoiceLineItemsArray>
+<ns2:SalesOrderNumbersArray>
+<salesOrderNumber>12345123</salesOrderNumber>
+</ns2:SalesOrderNumbersArray>
+</ns2:Invoice>
+</ns2:InvoiceArray>
+</ns2:GetInvoicesResponse>
+</S:Body>
+</S:Envelope>
+
+132
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar License Plate Number Service
+TEST: https://test-ws.sanmar.com:8080/SanMarWebService/webservices/PackingSlipService?wsdl
+PRODUCTION: https://ws.sanmar.com:8080/SanMarWebService/webservices/PackingSlipService?wsdl
+There is one function available for this web service.
+GetPackingSlip
+
+Sample License Plate Number Label
+
+133
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar GetPackingSlip Service
+This service returns packing slip information for each package when the associated LPN barcode at the
+bottom of the shipping label is scanned.
+Decorator Guidance: Packing Slip Calls submitted by a receiving decorator account credentials will
+result in a successful return if the Ship-To-Address matches the Account Address for the Decorator.
+Addresses that do not match will result in an ‘Data Not Found’ Message when submitted by the
+decorator account.
+
+SanMar GetPackingSlip Request Parameters
+Field
+wsVersion
+Userid
+Password
+PackingSlipId
+
+Description
+Web Service Version
+SanMar.com Username
+SanMar.com Password
+LPN Number
+
+Example
+1.0.0
+SanMarUsername
+SanMarPassword
+LP000123456789
+Valid Prefixes for LP
+Numbers include:
+LP, L, S, R.
+
+Required
+Yes
+Yes
+Yes
+Yes
+
+Type
+STRING
+STRING
+STRING
+
+Max Chars
+64
+64
+64
+
+SanMar GetPackingSlip Service XML Request
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:pac="http://ws.sanmar.com/webservices/PackingSlip">
+<soapenv:Header />
+<soapenv:Body>
+<pac:GetPackingSlip>
+<pac:wsVersion>1.0.0</pac:wsVersion>
+<pac:UserId>SanMarUsername</pac:UserId>
+<pac:Password>SanMarPassword</pac:Password>
+<pac:PackingSlipId>LP000123456789</pac:PackingSlipId>
+</pac:GetPackingSlip>
+</soapenv:Body>
+</soapenv:Envelope>
+
+134
+
+SanMar Web Services Integration Guide v24.1
+
+SanMar GetPackingSlip Service XML Response
+Please note: The ShipmentUnitIndex is the box number, and the items within that box will be part of the
+response.
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<GetPackingSlipResponse xmlns="http://ws.sanmar.com/
+webservices/PackingSlip">
+<PackingSlip id="LP000123456789">
+<Header>
+<ShipmentDate>2020-06-30</ShipmentDate>
+<ShipmentUnitIndex>1</ShipmentUnitIndex>
+<ShipmentUnitQuantity>1</ShipmentUnitQuantity>
+<OrderDate>2020-05-13</OrderDate>
+<OrderNumber>1234567</OrderNumber>
+<InvoiceNumber>1234567</InvoiceNumber>
+<PurchaseOrderReference>LPNEXAMPLE</PurchaseOrderReference>
+<ShipFrom>
+<Name>SanMar</Name>
+<Address>
+<Line1>1914 BILLING ST</Line1>
+<CityName>ISSAQUAH</CityName>
+<StateCode>WA</StateCode>
+<PostalCode>98027</PostalCode>
+<CountryCode>US</CountryCode>
+<IsResidential>true</IsResidential>
+</Address>
+</ShipFrom>
+<ShipTo>
+<Name>SanMarLPN</Name>
+<Address>
+<Line1>1914 BILLING ST</Line1>
+<Line2>1</Line2>
+<CityName>PRESTON</CityName>
+<StateCode>WA</StateCode>
+<PostalCode>98050</PostalCode>
+<CountryCode>US</CountryCode>
+<IsResidential>true</IsResidential>
+</Address>
+</ShipTo>
+<BillTo>
+<Name>SanMarLPN</Name>
+<Address>
+<Line1>1914 BILLING ST</Line1>
+<CityName>PRESTON</CityName>
+<StateCode>WA</StateCode>
+<PostalCode>98050</PostalCode>
+<CountryCode>US</CountryCode>
+<IsResidential>true</IsResidential>
+</Address>
+</BillTo>
+<Weight uom="lb">0.64</Weight>
+<Carrier>
+<Name>UPS</Name>
+<ShippingMethod>GROUND</ShippingMethod>
+
+135
+
+SanMar Web Services Integration Guide v24.1
+
+<TrackingId>1Z12345678912345</TrackingId>
+
+SanMar GetPackingSlip Service XML Response Continued
+</Carrier>
+</Header>
+<Body>
+<Item id="1">
+<SkuId>175762</SkuId>
+<StyleNo>PC61</StyleNo>
+<Description>PC Essential Tee</Description>
+<Color>Aquatic Blue</Color>
+<Size>S</Size>
+<Quantity>1</Quantity>
+<GTIN>00191265001373</GTIN>
+</Item>
+<Item id="2">
+<SkuId>176181</SkuId>
+<StyleNo>PC61Y</StyleNo>
+<Description>PC Yth Essential Tee</Description>
+<Color>Aquatic Blue</Color>
+<Size>XS</Size>
+<Quantity>1</Quantity>
+<GTIN>00191265072397</GTIN>
+</Item>
+</Body>
+</PackingSlip>
+</GetPackingSlipResponse>
+</S:Body>
+</S:Envelope>
+
+136
+
+SanMar Web Services Integration Guide v24.1
+
+Change Log
+July 2025
+• Updated PromoStandards GetProduct V2.0.0 Request and Response Parameters sections
+• Updated categories under SanMar getProductInfoByCategory Service
+• Updated SanMar GetPackingSlip Service with LPN information
+March 2025
+• Changed Edev to Test
+February 2025
+• Added Brands: A4, Stanley/Stella
+November 2024
+• Updated Onboarding Guidance
+• Updated Categories / Brand naming conventions
+• Updated Brand Restrictions
+September 2024
+• Formatting updates to Customer # / Username / Password and Timestamp Fields.
+August 2024
+• Removed PromoStandards Order Status Service V1.0.0
+July 2024
+• Added support for VA Warehouse (31)
+• Updated Brand Restrictions
+April 2024
+• Added PromoStandards GetOrderStatus Version V2.0.0
+• Updated Brand Restrictions
+June 2023
+• Formatting Updates to Example Calls.
+• Updated Brand Restrictions and GetProductInfoByBrand Tables.
+• Updated Edev Guidance.
+• Updated Decorator Guidance for GetPackingSlip Service.
+December 2022
+• Update to GetOrderShipment Notification Query Type 2.
+• Update to GetInventoryByStyleColorSize call allowing Submittal by Style, Style/Color and Style/Size.
+• Updated Brand Restrictions and GetProductInfoByBrand Tables.
+• Updated GetMediaCall documentation, SanMar only supports Document / Image calls.
+August 2022
+• Added Testing Recommendations
+• Updated LPN Response Information with added fields
+• Updated Brand Restrictions and GetProductInfoByBrand Tables
+137
+
+SanMar Web Services Integration Guide v24.1
+
+•
+
+Updated PS Inventory 2.0 Part Array Query
+
+May 2022
+• Added Best Practices section
+• Updated table of contents
+January 2022
+• Updated all EUAT WSDL’s to EDEV WSDL’s
+• Corrected Production and EDEV LPN WSDL’s
+• Updated the sample license plate number label image
+April 2021
+• Rewrote the following user guide items: SanMar Web Services Overview, Get Started,
+Authentication, Make a Soap Call, Make a Soap Call Using SoapUI, Errors, Web Service Data
+Usage.
+• Added a PHP quick start guide
+• Updated the web service API parameter tables and descriptions
+• Added brand WonderWink
+March 2021
+• Added Brands; Next Level, TravisMathew
+•
+
+Updated SanMar Product Information by Category & Brand
+
+December 2020
+• Added the PromoStandard Product data and Invoice services
+• Added revised xml responses for Promostandard product data and media services.
+July 2020 - Added PromoStandard Inventory 2.0.0 Final service
+May 2020
+•
+•
+•
+•
+•
+
+Added Brands; Carhartt, Champion, Comfort Colors & American Apparel
+Added web services usage recommendations page 2
+Updated productInfo responses and add notes regarding removal of piece pricing
+Updated all UAT environment WSDL endpoints to eUAT environment endpoints
+Added LPN ShipmentUnitIndex box# details
+
+May 2019 - Added PromoStandards Order Status Service
+March 2019 - Added PromoStandards Media Content Service
+January 2019
+• Corrected getPricing from text in the getOrdernotification and getInvoice services
+• Removed Brand: District Made
+• Added Brand: Carhartt
+• Corrected the link for the Promostandard Order Shipment Notification on the testing page
+• Added PromoStandards Prodct Pricing and Configuration Service
+138
+
+SanMar Web Services Integration Guide v24.1
+
+•
+
+Removed PromoStandards validation page testing information (not supported)
+
+September 2018 - Corrected table of contents page numbers
+August 2018
+• Added PromoStandards Inventory Version 2.0
+• Corrected PromoStandards validation page link
+July 2018
+•
+•
+•
+•
+
+Removed web service access IP restriction
+Added Brand: Bella+Canvas
+Corrected: product pricing info data fields to reflect Inventory key and size index
+Added TLS version 1.2 code information
+
+April 2018
+• Added the License Plate Number web services for high jump warehouses
+• Updated SoapUI URL link
+January 2018 - Corrected all UAT environment WSDL links from stage to UAT
+December 2017
+• Updated all links stage environment WSDLs from stage to uat for improved access and
+stability
+• Updated Brands list for ProductInfo call
+• Added PromoStandards Prodct Data Service
+October 2017
+• Updated links to sanmar.com
+• Updated Brand Restriction information
+• Added the North Face to Brand Restrictions
+• Added Rabbit Skins to Brand Restrictions
+April 2017 - Added PromoStandard Order Shipment Notification
+
+139
+
+
