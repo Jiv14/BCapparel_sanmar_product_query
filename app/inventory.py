@@ -95,8 +95,20 @@ class InventoryClient:
         self.last_ps_request_xml = xml
         self.last_ps_url = url
         resp = self.session.post(url, data=xml.encode("utf-8"), timeout=self.timeout)
-        resp.raise_for_status()
+        # Always capture response text for debugging, even on HTTP errors
         self.last_ps_response_xml = resp.text
+        if resp.status_code >= 400:
+            # Attempt to parse SOAP Fault for a meaningful message
+            try:
+                parsed = self._parse_promostandards_inventory_response(resp.text)
+                # Ensure error flag/message present
+                if not parsed.get("error"):
+                    parsed["error"] = True
+                    parsed["message"] = f"HTTP {resp.status_code}: {resp.text[:400]}"
+                return parsed
+            except Exception:
+                return {"rows": [], "error": True, "message": f"HTTP {resp.status_code}: {resp.text[:400]}"}
+        # Normal successful response
         return self._parse_promostandards_inventory_response(resp.text)
 
     def _parse_promostandards_inventory_response(self, xml_text: str) -> Dict[str, List[Dict]]:
@@ -218,8 +230,19 @@ class InventoryClient:
         headers = {"SOAPAction": f'"{action}"'}
         self.last_standard_url = url
         resp = self.session.post(url, headers=headers, data=xml.encode("utf-8"), timeout=self.timeout)
-        resp.raise_for_status()
+        # Always capture response text for debugging, even on HTTP errors
         self.last_standard_response_xml = resp.text
+        if resp.status_code >= 400:
+            try:
+                parsed = self._parse_standard_inventory_response(resp.text)
+                # Ensure error flag/message present
+                if not parsed.get("error"):
+                    parsed["error"] = True
+                if not parsed.get("message"):
+                    parsed["message"] = f"HTTP {resp.status_code}: {resp.text[:400]}"
+                return parsed
+            except Exception:
+                return {"rows": [], "error": True, "message": f"HTTP {resp.status_code}: {resp.text[:400]}"}
         return self._parse_standard_inventory_response(resp.text)
 
     def _parse_standard_inventory_response(self, xml_text: str) -> Dict[str, List[Dict]]:
